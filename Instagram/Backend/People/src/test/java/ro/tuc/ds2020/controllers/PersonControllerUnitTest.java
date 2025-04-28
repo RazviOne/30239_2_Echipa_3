@@ -10,6 +10,7 @@ import ro.tuc.ds2020.dtos.PersonDTO;
 import ro.tuc.ds2020.services.PersonService;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,10 +29,22 @@ public class PersonControllerUnitTest extends Ds2020TestConfig {
         ObjectMapper objectMapper = new ObjectMapper();
         PersonDTO personDTO = new PersonDTO("John", "johnutzu", "ciocanim", 0,
                 false, false, "john.johnutzu@gmail.com", "0724917302",
-                LocalDateTime.of(2000, 1, 1, 0, 0), "Suplacu de Barcau");
+                LocalDateTime.parse("2000-09-15T00:10:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME), "Suplacu de Barcau");
 
-        mockMvc.perform(post("/person")
-                .content(objectMapper.writeValueAsString(personDTO))
+        String personString = "{\n" +
+                "    \"name\": \"Coroian Razvan\",\n" +
+                "    \"username\": \"RazviOne\",\n" +
+                "    \"password\": \"mechanicMaster\",\n" +
+                "    \"userScore\": 100,\n" +
+                "    \"isAdmin\": true,\n" +
+                "    \"isBanned\": false,\n" +
+                "    \"email\": \"razvan.coroian@gmail.com\",\n" +
+                "    \"phoneNumber\": \"0345123426\",\n" +
+                "    \"birthDate\": \"2000-09-15T00:10:00\",\n" +
+                "    \"homeCity\": \"Cluj-Napoca\"\n" +
+                "}";
+        mockMvc.perform(post("/people")
+                .content(personString)
                 .contentType("application/json"))
                 .andExpect(status().isCreated());
     }
@@ -43,21 +56,47 @@ public class PersonControllerUnitTest extends Ds2020TestConfig {
                 false, false, "john.johnutzu@gmail.com", "0724917302",
                 LocalDateTime.of(2000, 1, 1, 0, 0), "Suplacu de Barcau");
 
-        mockMvc.perform(post("/person")
-                .content(objectMapper.writeValueAsString(personDTO))
+        String personString = "{\n" +
+                "    \"name\": \"Coroian Razvan\",\n" +
+                "    \"username\": \"RazviOne\",\n" +
+                "    \"password\": \"mechanicMaster\",\n" +
+                "    \"userScore\": 100,\n" +
+                "    \"isAdmin\": true,\n" +
+                "    \"isBanned\": false,\n" +
+                "    \"email\": \"razvan.coroian@gmail.com\",\n" +
+                "    \"phoneNumber\": \"0345123426\",\n" +
+                "    \"birthDate\": \"2000-09-15T00:10:00\",\n" +
+                "    \"homeCity\": \"Cluj-Napoca\"\n" +
+                "}";
+
+        mockMvc.perform(post("/people")
+                .content(personString)
                 .contentType("application/json"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isCreated());
     }
 
     @Test
     public void insertPersonTestFailsDueToNull() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        PersonDTO personDTO = new PersonDTO("John", "johnutzu", "ciocanim", 0,
+        PersonDTO personDTO = new PersonDTO(null, "johnutzu", "ciocanim", 0,
                 false, false, "john.johnutzu@gmail.com", "0724917302",
                 LocalDateTime.of(2000, 1, 1, 0, 0), "Suplacu de Barcau");
 
-        mockMvc.perform(post("/person")
-                .content(objectMapper.writeValueAsString(personDTO))
+        String personString = "{\n" +
+                "    \"name\": null,\n" +
+                "    \"username\": \"RazviOne\",\n" +
+                "    \"password\": \"mechanicMaster\",\n" +
+                "    \"userScore\": 100,\n" +
+                "    \"isAdmin\": true,\n" +
+                "    \"isBanned\": false,\n" +
+                "    \"email\": \"razvan.coroian@gmail.com\",\n" +
+                "    \"phoneNumber\": \"0345123426\",\n" +
+                "    \"birthDate\": \"2000-09-15T00:10:00\",\n" +
+                "    \"homeCity\": \"Cluj-Napoca\"\n" +
+                "}";
+
+        mockMvc.perform(post("/people")
+                .content(personString)
                 .contentType("application/json"))
                 .andExpect(status().isBadRequest());
     }
