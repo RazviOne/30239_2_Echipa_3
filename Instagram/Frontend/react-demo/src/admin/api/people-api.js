@@ -3,28 +3,28 @@ import RestApiClient from "../../commons/api/rest-client";
 
 
 const endpoint = {
-    person: '/person'
+    people: '/people'
 };
 
 function getPersons(callback) {
-    let request = new Request(HOST.person_api + endpoint.person, {
+    let request = new Request(HOST.people_api + endpoint.people, {
         method: 'GET',
     });
-    // console.log(request.url);
+    console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
 function getPersonById(personId, callback){
-    let request = new Request(HOST.person_api + endpoint.person + "/" + personId, {
+    let request = new Request(HOST.people_api + endpoint.people + "/" + personId, {
         method: 'GET'
     });
 
-    // console.log(request.url);
+    console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
 function postPerson(user, callback){
-    let request = new Request(HOST.person_api + endpoint.person , {
+    let request = new Request(HOST.people_api + endpoint.people , {
         method: 'POST',
         headers : {
             'Accept': 'application/json',
@@ -33,13 +33,13 @@ function postPerson(user, callback){
         body: JSON.stringify(user)
     });
 
-    // console.log("URL: " + request.url);
+    console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
 
 function editPerson(user, callback){
-    let request = new Request(HOST.person_api + endpoint.person + "/" + user.userId , {
+    let request = new Request(HOST.people_api + endpoint.people + "/" + user.userId , {
         method: 'POST',
         headers : {
             'Accept': 'application/json',
@@ -48,13 +48,13 @@ function editPerson(user, callback){
         body: JSON.stringify(user)
     });
 
-    // console.log("URL: " + request.url);
+    console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
 
 function deletePerson(personId, callback){
-    let request = new Request(HOST.person_api + endpoint.person + "/" + personId, {
+    let request = new Request(HOST.people_api + endpoint.people + "/" + personId, {
         method: 'DELETE',
         headers : {
             'Accept': '*/*',
@@ -62,21 +62,21 @@ function deletePerson(personId, callback){
         },
     });
 
-    // console.log("URL: " + request.url);
+    console.log("URL: " + request.url);
 
     try {
         RestApiClient.performRequest(request, callback);
     } catch (error){
-        // console.log(`In API: ${error}`);
+        console.log(`In API: ${error}`);
     }
 }
 
 function authenticateUser(username, password, callback){
-    let request = new Request(HOST.person_api + endpoint.person + "/authenticate/" + username + "/" + password, {
+    let request = new Request(HOST.people_api + endpoint.people + "/authenticate/" + username + "/" + password, {
         method: 'GET',
     });
 
-    // console.log("URL: " + request.url);
+    console.log("URL: " + request.url);
     RestApiClient.performRequest(request, callback);
 }
 

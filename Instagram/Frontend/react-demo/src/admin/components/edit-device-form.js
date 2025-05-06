@@ -1,7 +1,7 @@
 import React from 'react';
 import validate from "./validators/person-validators";
 import Button from "react-bootstrap/Button";
-import * as API_DEVICE from "../api/device-api";
+import * as API_DEVICE from "../api/posts-api";
 import APIResponseErrorMessage from "../../commons/errorhandling/api-response-error-message";
 import {Col, Row} from "reactstrap";
 import { FormGroup, Input, Label} from 'reactstrap';

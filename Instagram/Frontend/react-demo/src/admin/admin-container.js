@@ -20,9 +20,9 @@ import DeleteDeviceForm from "./components/delete-device-form";
 import EditDeviceForm from "./components/edit-device-form";
 import AddDeviceLinkForm from "./components/add-deviceLink-form";
 import DeleteDeviceLinkForm from "./components/delete-deviceLink-form";
-import * as API_USERS from "./api/person-api";
-import * as API_DEVICES from "./api/device-api"
-import * as API_DEVICELINKS from "./api/deviceLink-api"
+import * as API_USERS from "./api/people-api";
+import * as API_DEVICES from "./api/posts-api"
+import * as API_DEVICELINKS from "./api/reactions-api"
 import PersonTable from "./components/person-table";
 import DeviceTable from "./components/device-table";
 import DeviceLinkTable from "./components/deviceLink-table";

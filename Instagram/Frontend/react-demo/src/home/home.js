@@ -4,7 +4,7 @@ import { UserContext } from "../contexts/UserContext";
 import BackgroundImg from '../commons/images/future-medicine.jpg';
 
 import {Button, Container, FormGroup, Input, Jumbotron, Label, Alert} from 'reactstrap';
-import * as API_USERS from "../admin/api/person-api";
+import * as API_USERS from "../admin/api/people-api";
 
 const backgroundStyle = {
     backgroundPosition: 'center',

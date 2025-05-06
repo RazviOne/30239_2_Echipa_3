@@ -3,19 +3,19 @@ import RestApiClient from "../../commons/api/rest-client";
 
 
 const endpoint = {
-    device: '/device'
+    posts: '/posts'
 };
 
-function getDevices(callback) {
-    let request = new Request(HOST.device_api + endpoint.device, {
+function getPosts(callback) {
+    let request = new Request(HOST.posts_api + endpoint.posts, {
         method: 'GET',
     });
-    // console.log(request.url);
+    console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
-function getDeviceById(deviceId, callback){
-    let request = new Request(HOST.device_api + endpoint.device + "/" + deviceId, {
+function getPostById(postId, callback){
+    let request = new Request(HOST.posts_api + endpoint.device + "/" + deviceId, {
         method: 'GET'
     });
 
