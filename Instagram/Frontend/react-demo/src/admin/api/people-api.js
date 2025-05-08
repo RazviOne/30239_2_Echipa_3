@@ -39,7 +39,7 @@ function postPerson(user, callback){
 }
 
 function editPerson(user, callback){
-    let request = new Request(HOST.people_api + endpoint.people + "/" + user.userId , {
+    let request = new Request(HOST.people_api + endpoint.people + "/" + user.personId , {
         method: 'POST',
         headers : {
             'Accept': 'application/json',

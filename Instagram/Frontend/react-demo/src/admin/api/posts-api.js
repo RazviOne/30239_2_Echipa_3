@@ -15,46 +15,46 @@ function getPosts(callback) {
 }
 
 function getPostById(postId, callback){
-    let request = new Request(HOST.posts_api + endpoint.device + "/" + deviceId, {
+    let request = new Request(HOST.posts_api + endpoint.posts + "/" + postId, {
         method: 'GET'
     });
 
-    // console.log(request.url);
+    console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
-function postDevice(device, callback){
-    let request = new Request(HOST.device_api + endpoint.device , {
+function postPost(post, callback){
+    let request = new Request(HOST.posts_api + endpoint.posts , {
         method: 'POST',
         headers : {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(device)
+        body: JSON.stringify(post)
     });
 
-    // console.log("URL: " + request.url);
+    console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
 
-function editDevice(device, callback){
-    let request = new Request(HOST.device_api + endpoint.device + "/" + device.deviceId , {
+function editPost(post, callback){
+    let request = new Request(HOST.posts_api + endpoint.posts + "/" + post.postId , {
         method: 'POST',
         headers : {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(device)
+        body: JSON.stringify(post)
     });
 
-    // console.log("URL: " + request.url);
+    console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
 
-function deleteDevice(deviceId, callback){
-    let request = new Request(HOST.device_api + endpoint.device + "/" + deviceId, {
+function deletePost(postId, callback){
+    let request = new Request(HOST.posts_api + endpoint.posts + "/" + postId, {
         method: 'DELETE',
         headers : {
             'Accept': '*/*',
@@ -62,19 +62,19 @@ function deleteDevice(deviceId, callback){
         },
     });
 
-    // console.log("URL: " + request.url);
+    console.log("URL: " + request.url);
 
     try {
         RestApiClient.performRequest(request, callback);
     } catch (error){
-        // console.log(`In API: ${error}`);
+        console.log(`In API: ${error}`);
     }
 }
 
 export {
-    getDevices,
-    getDeviceById,
-    postDevice,
-    deleteDevice,
-    editDevice
+    getPosts,
+    getPostById,
+    postPost,
+    deletePost,
+    editPost
 };
