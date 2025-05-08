@@ -14,8 +14,8 @@ function getReactions (callback) {
     RestApiClient.performRequest(request, callback);
 }
 
-function getReactionById(reactionId, callback){
-    let request = new Request(HOST.reactions_api + endpoint.reactions + "/" + reactionId, {
+function getReactionById(idReaction, callback){
+    let request = new Request(HOST.reactions_api + endpoint.reactions + "/" + idReaction, {
         method: 'GET'
     });
 
@@ -38,8 +38,8 @@ function postReaction(reaction, callback){
     RestApiClient.performRequest(request, callback);
 }
 
-function deleteReaction(reactionId, callback){
-    let request = new Request(HOST.reactions_api + endpoint.reactions + "/" + reactionId, {
+function deleteReaction(idReaction, callback){
+    let request = new Request(HOST.reactions_api + endpoint.reactions + "/" + idReaction, {
         method: 'DELETE',
         headers : {
             'Accept': '*/*',

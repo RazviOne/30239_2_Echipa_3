@@ -15,14 +15,14 @@ import {
 import AddPersonForm from "./components/add-person-form";
 import DeletePersonForm from "./components/delete-person-form";
 import EditPersonForm from "./components/edit-person-form";
-import AddDeviceForm from "./components/add-device-form";
+import AddPostForm from "./components/add-post-form";
 import DeleteDeviceForm from "./components/delete-device-form";
 import EditDeviceForm from "./components/edit-device-form";
 import AddDeviceLinkForm from "./components/add-deviceLink-form";
 import DeleteDeviceLinkForm from "./components/delete-deviceLink-form";
-import * as API_USERS from "./api/people-api";
-import * as API_DEVICES from "./api/posts-api"
-import * as API_DEVICELINKS from "./api/reactions-api"
+import * as API_PEOPLE from "./api/people-api";
+import * as API_POSTS from "./api/posts-api"
+import * as API_REACTIONS from "./api/reactions-api"
 import PersonTable from "./components/person-table";
 import DeviceTable from "./components/device-table";
 import DeviceLinkTable from "./components/deviceLink-table";
@@ -358,7 +358,7 @@ class AdminContainer extends React.Component {
                     >
                         <ModalHeader toggle={this.toggleAddDeviceForm}>Add Device:</ModalHeader>
                         <ModalBody>
-                            <AddDeviceForm reloadHandler={this.reload} />
+                            <AddPostForm reloadHandler={this.reload} />
                         </ModalBody>
                     </Modal>
 

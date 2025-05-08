@@ -1,7 +1,7 @@
 import React from 'react';
 import validate from "./validators/person-validators";
 import Button from "react-bootstrap/Button";
-import * as API_USERS from "../api/people-api";
+import * as API_PEOPLE from "../api/people-api";
 import APIResponseErrorMessage from "../../commons/errorhandling/api-response-error-message";
 import {Col, Row} from "reactstrap";
 import { FormGroup, Input, Label} from 'reactstrap';
@@ -23,6 +23,16 @@ class AddPersonForm extends React.Component {
             formIsValid: false,
 
             formControls: {
+                name:{
+                    value: '',
+                    placeholder: 'Your name...',
+                    valid: false,
+                    touched: false,
+                    validationRules: {
+                        minLength: 1,
+                        isRequired: true
+                    }
+                },
                 username:{
                     value: '',
                     placeholder: 'Cool online identity...',
@@ -43,32 +53,6 @@ class AddPersonForm extends React.Component {
                         isRequired: true
                     }
                 },
-                name: {
-                    value: '',
-                    placeholder: 'What is your name?...',
-                    valid: false,
-                    touched: false,
-                    validationRules: {
-                        minLength: 3,
-                        isRequired: true
-                    }
-                },
-                address: {
-                    value: '',
-                    placeholder: 'Str. Primaverii 21...',
-                    valid: false,
-                    touched: false,
-                    validationRules: {
-                        minLength: 10,
-                        isRequired: true
-                    }
-                },
-                age: {
-                    value: '',
-                    placeholder: 'Age...',
-                    valid: false,
-                    touched: false,
-                },
                 isAdmin: {
                     value: '',
                     placeholder: 'Are you an admin? (true/false)...',
@@ -76,6 +60,46 @@ class AddPersonForm extends React.Component {
                     touched: false,
                     validationRules: {
                         minLength: 4,
+                        isRequired: true
+                    }
+                },
+                email: {
+                    value: '',
+                    placeholder: 'Your personal email account...',
+                    valid: false,
+                    touched: false,
+                    validationRules: {
+                        minLength: 1,
+                        isRequired: true
+                    }
+                },
+                phoneNumber: {
+                    value: '',
+                    placeholder: 'Your personal phone number...',
+                    valid: false,
+                    touched: false,
+                    validationRules: {
+                        minLength: 10,
+                        isRequired: true
+                    }
+                },
+                birthDate: {
+                    value: '',
+                    placeholder: 'The date your were born...',
+                    valid: false,
+                    touched: false,
+                    validationRules: {
+                        minLength: 1,
+                        isRequired: true
+                    }
+                },
+                homeCity: {
+                    value: '',
+                    placeholder: 'Cluj-Napoca...',
+                    valid: false,
+                    touched: false,
+                    validationRules: {
+                        minLength: 1,
                         isRequired: true
                     }
                 }
@@ -118,9 +142,9 @@ class AddPersonForm extends React.Component {
     };
 
     registerPerson(person) {
-        return API_USERS.postPerson(person, (result, status, error) => {
+        return API_PEOPLE.postPerson(person, (result, status, error) => {
             if (result !== null && (status === 200 || status === 201)) {
-                // console.log("Successfully inserted person with id: " + result);
+                console.log("Successfully inserted person with id: " + result);
                 this.reloadHandler();
             } else {
                 this.setState(({
@@ -133,21 +157,38 @@ class AddPersonForm extends React.Component {
 
     handleSubmit() {
         let person = {
+            name: this.state.formControls.name.value,
             username: this.state.formControls.username.value,
             password: this.state.formControls.password.value,
-            name: this.state.formControls.name.value,
-            address: this.state.formControls.address.value,
-            age: this.state.formControls.age.value,
-            isAdmin: this.state.formControls.isAdmin.value
+            userScore: 0,
+            isAdmin: this.state.formControls.isAdmin.value,
+            isBanned: false,
+            email: this.state.formControls.email.value,
+            phoneNumber: this.state.formControls.phoneNumber.value,
+            birthDate: this.state.formControls.birthDate.value,
+            homeCity: this.state.formControls.homeCity.value
         };
 
-        // console.log(person);
+        console.log(person);
         this.registerPerson(person);
     }
 
     render() {
         return (
             <div>
+
+                <FormGroup id='name'>
+                    <Label for='nameField'> Name: </Label>
+                    <Input name='name' id='nameField' placeholder={this.state.formControls.name.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.name.value}
+                           touched={this.state.formControls.name.touched? 1 : 0}
+                           valid={this.state.formControls.name.valid}
+                           required
+                    />
+                    {this.state.formControls.name.touched && !this.state.formControls.name.valid &&
+                        <div className={"error-message row"}> * Name must have at least 3 characters </div>}
+                </FormGroup>
 
                 <FormGroup id='username'>
                     <Label for='usernameField'> Username: </Label>
@@ -175,42 +216,6 @@ class AddPersonForm extends React.Component {
                         <div className={"error-message row"}> * Password must have at least 1 characters </div>}
                 </FormGroup>
 
-                <FormGroup id='name'>
-                    <Label for='nameField'> Name: </Label>
-                    <Input name='name' id='nameField' placeholder={this.state.formControls.name.placeholder}
-                           onChange={this.handleChange}
-                           defaultValue={this.state.formControls.name.value}
-                           touched={this.state.formControls.name.touched? 1 : 0}
-                           valid={this.state.formControls.name.valid}
-                           required
-                    />
-                    {this.state.formControls.name.touched && !this.state.formControls.name.valid &&
-                        <div className={"error-message row"}> * Name must have at least 3 characters </div>}
-                </FormGroup>
-
-                <FormGroup id='address'>
-                    <Label for='addressField'> Address: </Label>
-                    <Input name='address' id='addressField' placeholder={this.state.formControls.address.placeholder}
-                           onChange={this.handleChange}
-                           defaultValue={this.state.formControls.address.value}
-                           touched={this.state.formControls.address.touched? 1 : 0}
-                           valid={this.state.formControls.address.valid}
-                           required
-                    />
-                </FormGroup>
-
-                <FormGroup id='age'>
-                    <Label for='ageField'> Age: </Label>
-                    <Input name='age' id='ageField' placeholder={this.state.formControls.age.placeholder}
-                           min={0} max={100} type="number"
-                           onChange={this.handleChange}
-                           defaultValue={this.state.formControls.age.value}
-                           touched={this.state.formControls.age.touched? 1 : 0}
-                           valid={this.state.formControls.age.valid}
-                           required
-                    />
-                </FormGroup>
-
                 <FormGroup id='isAdmin'>
                     <Label for='isAdminField'> Is Admin: </Label>
                     <Input name='isAdmin' id='isAdminField' placeholder={this.state.formControls.isAdmin.placeholder}
@@ -225,9 +230,51 @@ class AddPersonForm extends React.Component {
                     </Input>
                 </FormGroup>
 
+                <FormGroup id='email'>
+                    <Label for='emailField'> Email: </Label>
+                    <Input name='email' id='emailField' placeholder={this.state.formControls.email.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.email.value}
+                           touched={this.state.formControls.email.touched? 1 : 0}
+                           valid={this.state.formControls.email.valid}
+                           required
+                    />
+                </FormGroup>
+
+                <FormGroup id='phoneNumber'>
+                    <Label for='phoneNumberField'> Phone Number: </Label>
+                    <Input name='phoneNumber' id='phoneNumberField' placeholder={this.state.formControls.phoneNumber.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.phoneNumber.value}
+                           touched={this.state.formControls.phoneNumber.touched? 1 : 0}
+                           valid={this.state.formControls.phoneNumber.valid}
+                           required
+                    />
+                </FormGroup>
+
+                <FormGroup id='birthDate'>
+                    <Label for='birthDateField'> Birth Date: </Label>
+                    <Input name='birthDate' id='birthDateField' placeholder={this.state.formControls.birthDate.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.birthDate.value}
+                           touched={this.state.formControls.birthDate.touched? 1 : 0}
+                           valid={this.state.formControls.birthDate.valid}
+                    />
+                </FormGroup>
+
+                <FormGroup id='homeCity'>
+                    <Label for='homeCityField'> Home City: </Label>
+                    <Input name='homeCity' id='homeCityField' placeholder={this.state.formControls.homeCity.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.homeCity.value}
+                           touched={this.state.formControls.homeCity.touched? 1 : 0}
+                           valid={this.state.formControls.homeCity.valid}
+                    />
+                </FormGroup>
+
                 <Row>
                     <Col sm={{size: '4', offset: 8}}>
-                        <Button type={"submit"} disabled={!this.state.formIsValid} onClick={this.handleSubmit}>  Submit </Button>
+                        <Button type={"submit"} disabled={!this.state.formIsValid} onClick={this.handleSubmit}> Submit </Button>
                     </Col>
                 </Row>
 

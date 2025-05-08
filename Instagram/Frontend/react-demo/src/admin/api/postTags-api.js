@@ -3,19 +3,19 @@ import RestApiClient from "../../commons/api/rest-client";
 
 
 const endpoint = {
-    posts: '/posts'
+    postTags: '/postTags'
 };
 
-function getPosts(callback) {
-    let request = new Request(HOST.posts_api + endpoint.posts, {
+function getPostTags(callback) {
+    let request = new Request(HOST.posts_api + endpoint.postTags, {
         method: 'GET',
     });
     console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
-function getPostById(idPost, callback){
-    let request = new Request(HOST.posts_api + endpoint.posts + "/" + idPost, {
+function getPostTagById(idPostTag, callback){
+    let request = new Request(HOST.posts_api + endpoint.postTags + "/" + idPostTag, {
         method: 'GET'
     });
 
@@ -23,14 +23,14 @@ function getPostById(idPost, callback){
     RestApiClient.performRequest(request, callback);
 }
 
-function postPost(post, callback){
-    let request = new Request(HOST.posts_api + endpoint.posts , {
+function postPostTag(postTag, callback){
+    let request = new Request(HOST.posts_api + endpoint.postTags , {
         method: 'POST',
         headers : {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(post)
+        body: JSON.stringify(postTag)
     });
 
     console.log("URL: " + request.url);
@@ -38,14 +38,14 @@ function postPost(post, callback){
     RestApiClient.performRequest(request, callback);
 }
 
-function editPost(post, callback){
-    let request = new Request(HOST.posts_api + endpoint.posts + "/" + post.idPost , {
+function editPostTag(postTag, callback){
+    let request = new Request(HOST.posts_api + endpoint.postTags + "/" + postTag.idPostTag , {
         method: 'POST',
         headers : {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(post)
+        body: JSON.stringify(postTag)
     });
 
     console.log("URL: " + request.url);
@@ -53,8 +53,8 @@ function editPost(post, callback){
     RestApiClient.performRequest(request, callback);
 }
 
-function deletePost(idPost, callback){
-    let request = new Request(HOST.posts_api + endpoint.posts + "/" + idPost, {
+function deletePostTag(idPostTag, callback){
+    let request = new Request(HOST.posts_api + endpoint.postTags + "/" + idPostTag, {
         method: 'DELETE',
         headers : {
             'Accept': '*/*',
@@ -72,9 +72,9 @@ function deletePost(idPost, callback){
 }
 
 export {
-    getPosts,
-    getPostById,
-    postPost,
-    deletePost,
-    editPost
+    getPostTags,
+    getPostTagById,
+    postPostTag,
+    deletePostTag,
+    editPostTag
 };

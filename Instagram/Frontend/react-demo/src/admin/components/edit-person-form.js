@@ -1,7 +1,7 @@
 import React from 'react';
 import validate from "./validators/person-validators";
 import Button from "react-bootstrap/Button";
-import * as API_USERS from "../api/people-api";
+import * as API_PEOPLE from "../api/people-api";
 import APIResponseErrorMessage from "../../commons/errorhandling/api-response-error-message";
 import {Col, Row} from "reactstrap";
 import { FormGroup, Input, Label} from 'reactstrap';
@@ -22,9 +22,19 @@ class EditPersonForm extends React.Component {
             formIsValid: false,
 
             formControls: {
-                userId:{
+                idPerson:{
                     value: '',
-                    placeholder: 'ID of user to be edited...',
+                    placeholder: 'ID of the person to be edited...',
+                    valid: false,
+                    touched: false,
+                    validationRules: {
+                        minLength: 1,
+                        isRequired: true
+                    }
+                },
+                name:{
+                    value: '',
+                    placeholder: 'Your name...',
                     valid: false,
                     touched: false,
                     validationRules: {
@@ -52,19 +62,29 @@ class EditPersonForm extends React.Component {
                         isRequired: true
                     }
                 },
-                name: {
+                isAdmin: {
                     value: '',
-                    placeholder: 'What is your name?...',
+                    placeholder: 'Are you an admin? (true/false)...',
                     valid: false,
                     touched: false,
                     validationRules: {
-                        minLength: 3,
+                        minLength: 4,
                         isRequired: true
                     }
                 },
-                address: {
+                email: {
                     value: '',
-                    placeholder: 'Str. Primaverii 21...',
+                    placeholder: 'Your personal email account...',
+                    valid: false,
+                    touched: false,
+                    validationRules: {
+                        minLength: 1,
+                        isRequired: true
+                    }
+                },
+                phoneNumber: {
+                    value: '',
+                    placeholder: 'Your personal phone number...',
                     valid: false,
                     touched: false,
                     validationRules: {
@@ -72,17 +92,25 @@ class EditPersonForm extends React.Component {
                         isRequired: true
                     }
                 },
-                age: {
+                birthDate: {
                     value: '',
-                    placeholder: 'Age...',
+                    placeholder: 'The date your were born...',
                     valid: false,
                     touched: false,
+                    validationRules: {
+                        minLength: 1,
+                        isRequired: true
+                    }
                 },
-                isAdmin: {
-                    value: false,
-                    placeholder: 'Are you an admin?',
-                    valid: true,
+                homeCity: {
+                    value: '',
+                    placeholder: 'Cluj-Napoca...',
+                    valid: false,
                     touched: false,
+                    validationRules: {
+                        minLength: 1,
+                        isRequired: true
+                    }
                 }
             }
         };
@@ -115,38 +143,44 @@ class EditPersonForm extends React.Component {
     };
 
     fetchPersonById = () => {
-        const personId = this.state.formControls.userId.value;
-        // console.log(`fetchPersonById(${personId})`);
+        const idPerson = this.state.formControls.idPerson.value;
+        console.log(`fetchPersonById(${idPerson})`);
 
-        if(!personId){
+        if(!idPerson){
             alert('Please enter a valid user ID.');
             return;
         }
 
-        return API_USERS.getPersonById(personId, (result, status, error) => {
+        return API_PEOPLE.getPersonById(idPerson, (result, status, error) => {
             if (result !== null && (status === 200 || status === 201)) {
-                // console.log("Successfully fetched person with id: " + personId);
+                console.log("Successfully fetched person with id: " + idPerson);
                 this.setState(prevState => ({
                     formControls: {
                         ...prevState.formControls,
+                        name: { ...prevState.formControls.name, value: result.name, valid: true},
                         username: { ...prevState.formControls.username, value: result.username, valid: true},
                         password: { ...prevState.formControls.password, value: result.password, valid: true},
-                        name: { ...prevState.formControls.name, value: result.name, valid: true},
-                        address: { ...prevState.formControls.address, value: result.address, valid: true},
-                        age: { ...prevState.formControls.age, value: result.age, valid: true},
                         isAdmin: { ...prevState.formControls.isAdmin, value: result.isAdmin, valid: true},
+                        isBanned: { ...prevState.formControls.isBanned, value: result.isBanned, valid: true},
+                        email: { ...prevState.formControls.email, value: result.email, valid: true},
+                        phoneNumber: { ...prevState.formControls.phoneNumber, value: result.phoneNumber, valid: true},
+                        birthDate: { ...prevState.formControls.birthDate, value: result.birthDate, valid: true},
+                        homeCity: { ...prevState.formControls.homeCity, value: result.homeCity, valid: true},
                     }
                 }));
             } else {
                 this.setState(prevState => ({
                     formControls: {
                         ...prevState.formControls,
+                        name: { ...prevState.formControls.name, value: '', valid: false},
                         username: { ...prevState.formControls.username, value: '', valid: false},
                         password: { ...prevState.formControls.password, value: '', valid: false},
-                        name: { ...prevState.formControls.name, value: '', valid: false},
-                        address: { ...prevState.formControls.address, value: '', valid: false},
-                        age: { ...prevState.formControls.age, value: '', valid: false},
-                        isAdmin: { ...prevState.formControls.isAdmin, value: false, valid: false},
+                        isAdmin: { ...prevState.formControls.isAdmin, value: '', valid: false},
+                        isBanned: { ...prevState.formControls.isBanned, value: '', valid: false},
+                        email: { ...prevState.formControls.email, value: '', valid: false},
+                        phoneNumber: { ...prevState.formControls.phoneNumber, value: '', valid: false},
+                        birthDate: { ...prevState.formControls.birthDate, value: '', valid: false},
+                        homeCity: { ...prevState.formControls.homeCity, value: '', valid: false},
                     },
                     formIsValid: false,
                     errorStatus: status,
@@ -157,9 +191,9 @@ class EditPersonForm extends React.Component {
     }
 
     updatePerson(person) {
-        return API_USERS.editPerson(person, (result, status, error) => {
+        return API_PEOPLE.editPerson(person, (result, status, error) => {
             if (result !== null && (status === 200 || status === 201)) {
-                // console.log("Successfully updated person with id: " + person.userId);
+                console.log("Successfully updated person with id: " + person.idPerson);
                 this.reloadHandler();
             } else {
                 this.setState(({
@@ -172,13 +206,17 @@ class EditPersonForm extends React.Component {
 
     handleSubmit = () => {
         let person = {
-            userId: this.state.formControls.userId.value,
+            personId: this.state.formControls.personId.value,
+            name: this.state.formControls.name.value,
             username: this.state.formControls.username.value,
             password: this.state.formControls.password.value,
-            name: this.state.formControls.name.value,
-            address: this.state.formControls.address.value,
-            age: this.state.formControls.age.value,
-            isAdmin: this.state.formControls.isAdmin.value
+            userScore: 0,
+            isAdmin: this.state.formControls.isAdmin.value,
+            isBanned: this.state.formControls.isBanned.value,
+            email: this.state.formControls.email.value,
+            phoneNumber: this.state.formControls.phoneNumber.value,
+            birthDate: this.state.formControls.birthDate.value,
+            homeCity: this.state.formControls.homeCity.value
         };
 
         // console.log(person);

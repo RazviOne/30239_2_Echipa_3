@@ -14,8 +14,8 @@ function getPersons(callback) {
     RestApiClient.performRequest(request, callback);
 }
 
-function getPersonById(personId, callback){
-    let request = new Request(HOST.people_api + endpoint.people + "/" + personId, {
+function getPersonById(idPerson, callback){
+    let request = new Request(HOST.people_api + endpoint.people + "/" + idPerson, {
         method: 'GET'
     });
 
@@ -39,7 +39,7 @@ function postPerson(user, callback){
 }
 
 function editPerson(user, callback){
-    let request = new Request(HOST.people_api + endpoint.people + "/" + user.personId , {
+    let request = new Request(HOST.people_api + endpoint.people + "/" + user.idPerson , {
         method: 'POST',
         headers : {
             'Accept': 'application/json',
@@ -53,8 +53,8 @@ function editPerson(user, callback){
     RestApiClient.performRequest(request, callback);
 }
 
-function deletePerson(personId, callback){
-    let request = new Request(HOST.people_api + endpoint.people + "/" + personId, {
+function deletePerson(idPerson, callback){
+    let request = new Request(HOST.people_api + endpoint.people + "/" + idPerson, {
         method: 'DELETE',
         headers : {
             'Accept': '*/*',

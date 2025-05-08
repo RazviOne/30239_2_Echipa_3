@@ -5,7 +5,7 @@ import Table from "../../commons/tables/table";
 const columns = [
     {
         Header: 'ID',
-        accessor: 'id',
+        accessor: 'personId',
     },
     {
         Header: 'Username',
