@@ -8,13 +8,45 @@ const columns = [
         accessor: 'personId',
     },
     {
+        Header: 'Name',
+        accessor: 'name',
+    },
+    {
         Header: 'Username',
         accessor: 'username',
     },
     {
         Header: 'Password',
         accessor: 'password'
-    }
+    },
+    {
+        Header: 'User Score',
+        accessor: 'userScore'
+    },
+    {
+        Header: 'Admin',
+        accessor: 'isAdmin'
+    },
+    {
+        Header: 'Banned',
+        accessor: 'isBanned'
+    },
+    {
+        Header: 'Email',
+        accessor: 'email'
+    },
+    {
+        Header: 'Phone Number',
+        accessor: 'phoneNumber'
+    },
+    {
+        Header: 'Birth Date',
+        accessor: 'birthDate'
+    },
+    {
+        Header: 'Home City',
+        accessor: 'homeCity'
+    },
 ];
 
 const filters = [

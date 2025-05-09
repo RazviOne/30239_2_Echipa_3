@@ -62,9 +62,29 @@ class EditPersonForm extends React.Component {
                         isRequired: true
                     }
                 },
+                userScore: {
+                    value: '',
+                    placeholder: 'User score',
+                    valid: false,
+                    touched: false,
+                    // disabled: true,
+                    validationRules: {
+                        minLength: 1,
+                    }
+                },
                 isAdmin: {
                     value: '',
-                    placeholder: 'Are you an admin? (true/false)...',
+                    placeholder: 'Is the user an admin? (true/false)...',
+                    valid: false,
+                    touched: false,
+                    validationRules: {
+                        minLength: 4,
+                        isRequired: true
+                    }
+                },
+                isBanned: {
+                    value: '',
+                    placeholder: 'Is the user banned? (true/false)...',
                     valid: false,
                     touched: false,
                     validationRules: {
@@ -74,7 +94,7 @@ class EditPersonForm extends React.Component {
                 },
                 email: {
                     value: '',
-                    placeholder: 'Your personal email account...',
+                    placeholder: 'Personal email account...',
                     valid: false,
                     touched: false,
                     validationRules: {
@@ -84,7 +104,7 @@ class EditPersonForm extends React.Component {
                 },
                 phoneNumber: {
                     value: '',
-                    placeholder: 'Your personal phone number...',
+                    placeholder: 'Personal phone number...',
                     valid: false,
                     touched: false,
                     validationRules: {
@@ -94,7 +114,7 @@ class EditPersonForm extends React.Component {
                 },
                 birthDate: {
                     value: '',
-                    placeholder: 'The date your were born...',
+                    placeholder: 'The date user was born...',
                     valid: false,
                     touched: false,
                     validationRules: {
@@ -160,6 +180,7 @@ class EditPersonForm extends React.Component {
                         name: { ...prevState.formControls.name, value: result.name, valid: true},
                         username: { ...prevState.formControls.username, value: result.username, valid: true},
                         password: { ...prevState.formControls.password, value: result.password, valid: true},
+                        userScore: { ...prevState.formControls.userScore, value: result.userScore, valid: true},
                         isAdmin: { ...prevState.formControls.isAdmin, value: result.isAdmin, valid: true},
                         isBanned: { ...prevState.formControls.isBanned, value: result.isBanned, valid: true},
                         email: { ...prevState.formControls.email, value: result.email, valid: true},
@@ -175,6 +196,7 @@ class EditPersonForm extends React.Component {
                         name: { ...prevState.formControls.name, value: '', valid: false},
                         username: { ...prevState.formControls.username, value: '', valid: false},
                         password: { ...prevState.formControls.password, value: '', valid: false},
+                        userScore: { ...prevState.formControls.userScore, value: '', valid: false},
                         isAdmin: { ...prevState.formControls.isAdmin, value: '', valid: false},
                         isBanned: { ...prevState.formControls.isBanned, value: '', valid: false},
                         email: { ...prevState.formControls.email, value: '', valid: false},
@@ -210,7 +232,7 @@ class EditPersonForm extends React.Component {
             name: this.state.formControls.name.value,
             username: this.state.formControls.username.value,
             password: this.state.formControls.password.value,
-            userScore: 0,
+            userScore: this.state.formControls.userScore.value,
             isAdmin: this.state.formControls.isAdmin.value,
             isBanned: this.state.formControls.isBanned.value,
             email: this.state.formControls.email.value,
@@ -219,7 +241,7 @@ class EditPersonForm extends React.Component {
             homeCity: this.state.formControls.homeCity.value
         };
 
-        // console.log(person);
+        console.log(person);
         this.updatePerson(person);
     }
 
@@ -227,15 +249,15 @@ class EditPersonForm extends React.Component {
         return (
             <div>
 
-                <FormGroup id='userId'>
-                    <Label for='userIdField'> ID: </Label>
+                <FormGroup id='idPerson'>
+                    <Label for='idPersonField'> ID Person: </Label>
                     <Input
-                        name='userId'
-                        id='userIdField'
+                        name='idPerson'
+                        id='idPersonField'
                         type='number'
-                        placeholder={this.state.formControls.userId.placeholder}
+                        placeholder={this.state.formControls.idPerson.placeholder}
                         onChange={this.handleChange}
-                        value={this.state.formControls.userId.value}
+                        value={this.state.formControls.idPerson.value}
                         required
                     />
 
@@ -244,11 +266,24 @@ class EditPersonForm extends React.Component {
                     </Button>
                 </FormGroup>
 
+                <FormGroup id='name'>
+                    <Label for='nameField'> Name: </Label>
+                    <Input name='name' id='nameField' placeholder={this.state.formControls.name.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.name.value}
+                           touched={this.state.formControls.name.touched? 1 : 0}
+                           valid={this.state.formControls.name.valid}
+                           required
+                    />
+                    {this.state.formControls.name.touched && !this.state.formControls.name.valid &&
+                        <div className={"error-message row"}> * Name must have at least 3 characters </div>}
+                </FormGroup>
+
                 <FormGroup id='username'>
                     <Label for='usernameField'> Username: </Label>
                     <Input name='username' id='usernameField' placeholder={this.state.formControls.username.placeholder}
                            onChange={this.handleChange}
-                           value={this.state.formControls.username.value}
+                           defaultValue={this.state.formControls.username.value}
                            touched={this.state.formControls.username.touched? 1 : 0}
                            valid={this.state.formControls.username.valid}
                            required
@@ -259,67 +294,95 @@ class EditPersonForm extends React.Component {
 
                 <FormGroup id='password'>
                     <Label for='passwordField'> Password: </Label>
-                    <Input
-                        name='password'
-                        id='passwordField'
-                        type='password'
-                        placeholder={this.state.formControls.password.placeholder}
-                        onChange={this.handleChange}
-                        value={this.state.formControls.password.value}
-                        touched={this.state.formControls.password.touched? 1 : 0}
-                        valid={this.state.formControls.password.valid}
-                        required
+                    <Input name='password' id='passwordField' placeholder={this.state.formControls.password.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.password.value}
+                           touched={this.state.formControls.password.touched? 1 : 0}
+                           valid={this.state.formControls.password.valid}
+                           required
                     />
                     {this.state.formControls.password.touched && !this.state.formControls.password.valid &&
                         <div className={"error-message row"}> * Password must have at least 1 characters </div>}
                 </FormGroup>
 
-                <FormGroup id='name'>
-                    <Label for='nameField'> Name: </Label>
-                    <Input name='name' id='nameField' placeholder={this.state.formControls.name.placeholder}
+                <FormGroup id='userScore'>
+                    <Label for='userScoreField'> User Score: </Label>
+                    <Input name='userScore' id='userScoreField' placeholder={this.state.formControls.userScore.placeholder}
                            onChange={this.handleChange}
-                           value={this.state.formControls.name.value}
-                           touched={this.state.formControls.name.touched? 1 : 0}
-                           valid={this.state.formControls.name.valid}
-                           required
+                           defaultValue={this.state.formControls.userScore.value}
+                           touched={this.state.formControls.userScore.touched? 1 : 0}
+                           valid={this.state.formControls.userScore.valid}
                     />
-                    {this.state.formControls.name.touched && !this.state.formControls.name.valid &&
-                        <div className={"error-message row"}> * Name must have at least 3 characters </div>}
-                </FormGroup>
-
-                <FormGroup id='address'>
-                    <Label for='addressField'> Address: </Label>
-                    <Input name='address' id='addressField' placeholder={this.state.formControls.address.placeholder}
-                           onChange={this.handleChange}
-                           value={this.state.formControls.address.value}
-                           touched={this.state.formControls.address.touched? 1 : 0}
-                           valid={this.state.formControls.address.valid}
-                           required
-                    />
-                </FormGroup>
-
-                <FormGroup id='age'>
-                    <Label for='ageField'> Age: </Label>
-                    <Input name='age' id='ageField' placeholder={this.state.formControls.age.placeholder}
-                           min={0} max={100} type="number"
-                           onChange={this.handleChange}
-                           value={this.state.formControls.age.value}
-                           touched={this.state.formControls.age.touched? 1 : 0}
-                           valid={this.state.formControls.age.valid}
-                           required
-                    />
+                    {this.state.formControls.userScore.touched && !this.state.formControls.userScore.valid &&
+                        <div className={"error-message row"}> * User Score must have at least 1 characters </div>}
                 </FormGroup>
 
                 <FormGroup id='isAdmin'>
                     <Label for='isAdminField'> Is Admin: </Label>
-                    <Input
-                        name='isAdmin'
-                        id='isAdminField'
-                        type="checkbox"
-                        checked={this.state.formControls.isAdmin.value}
-                        onChange={this.handleChange}
+                    <Input name='isAdmin' id='isAdminField' placeholder={this.state.formControls.isAdmin.placeholder}
+                           type="boolean"
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.isAdmin.value}
+                           touched={this.state.formControls.isAdmin.touched? 1 : 0}
+                           valid={this.state.formControls.isAdmin.valid}
+                           required
                     >
                     </Input>
+                </FormGroup>
+
+                <FormGroup id='isBanned'>
+                    <Label for='isBannedField'> Is Banned: </Label>
+                    <Input name='isBanned' id='isBannedField' placeholder={this.state.formControls.isBanned.placeholder}
+                           type="boolean"
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.isBanned.value}
+                           touched={this.state.formControls.isBanned.touched? 1 : 0}
+                           valid={this.state.formControls.isBanned.valid}
+                           required
+                    >
+                    </Input>
+                </FormGroup>
+
+                <FormGroup id='email'>
+                    <Label for='emailField'> Email: </Label>
+                    <Input name='email' id='emailField' placeholder={this.state.formControls.email.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.email.value}
+                           touched={this.state.formControls.email.touched? 1 : 0}
+                           valid={this.state.formControls.email.valid}
+                           required
+                    />
+                </FormGroup>
+
+                <FormGroup id='phoneNumber'>
+                    <Label for='phoneNumberField'> Phone Number: </Label>
+                    <Input name='phoneNumber' id='phoneNumberField' placeholder={this.state.formControls.phoneNumber.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.phoneNumber.value}
+                           touched={this.state.formControls.phoneNumber.touched? 1 : 0}
+                           valid={this.state.formControls.phoneNumber.valid}
+                           required
+                    />
+                </FormGroup>
+
+                <FormGroup id='birthDate'>
+                    <Label for='birthDateField'> Birth Date: </Label>
+                    <Input name='birthDate' id='birthDateField' placeholder={this.state.formControls.birthDate.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.birthDate.value}
+                           touched={this.state.formControls.birthDate.touched? 1 : 0}
+                           valid={this.state.formControls.birthDate.valid}
+                    />
+                </FormGroup>
+
+                <FormGroup id='homeCity'>
+                    <Label for='homeCityField'> Home City: </Label>
+                    <Input name='homeCity' id='homeCityField' placeholder={this.state.formControls.homeCity.placeholder}
+                           onChange={this.handleChange}
+                           defaultValue={this.state.formControls.homeCity.value}
+                           touched={this.state.formControls.homeCity.touched? 1 : 0}
+                           valid={this.state.formControls.homeCity.valid}
+                    />
                 </FormGroup>
 
                 <Row>

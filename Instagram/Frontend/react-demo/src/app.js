@@ -1,7 +1,7 @@
 import React from 'react'
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 import NavigationBar from './navigation-bar'
-import Home from './home/home';
+import Login from './login/login';
 import PersonContainer from './person/person-container'
 import AdminContainer from './admin/admin-container'
 
@@ -23,22 +23,32 @@ class App extends React.Component {
                             <Route
                                 exact
                                 path='/'
-                                render={() => <Home/>}
+                                render={() => <Login/>}
                             />
 
-                            <ProtectedRoute
-                                exact
-                                path="/admin"
-                                component={AdminContainer}
-                                adminOnly={true}
-                            />
+                            {/*<ProtectedRoute*/}
+                            {/*    exact*/}
+                            {/*    path="/admin"*/}
+                            {/*    component={AdminContainer}*/}
+                            {/*    // adminOnly={true}*/}
+                            {/*/>*/}
 
-                            <ProtectedRoute
+                            {/*<ProtectedRoute*/}
+                            {/*    exact*/}
+                            {/*    path="/person"*/}
+                            {/*    component={PersonContainer}*/}
+                            {/*/>*/}
+                            <Route
                                 exact
-                                path="/person"
+                                path='/person'
                                 component={PersonContainer}
                             />
 
+                            <Route
+                                exact
+                                path='/admin'
+                                component={AdminContainer}
+                            />
 
                             {/*Error*/}
                             <Route

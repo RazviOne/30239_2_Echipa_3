@@ -16,7 +16,7 @@ const backgroundStyle = {
 };
 const textStyle = {color: 'white', };
 
-class Home extends React.Component {
+class Login extends React.Component {
 
     static contextType = UserContext;
 
@@ -41,39 +41,39 @@ class Home extends React.Component {
     }
 
     handleUserLogin(){
-        const { username, password } = this.state;
-        const { login } = this.context;
-
-        if(username === '' || password === ''){
-            this.setState({ errorMessage: 'Please enter both username and password'});
-            return;
-        }
-
-        // console.log(`Inputs:\nusername: ${username}\npassword: ${password}`);
-        API_USERS.authenticateUser(username, password, (result, status, error) => {
-            if (result !== null && (status === 200 || status === 202)) {
-                // console.log('Authentication successful');
-
-                const userData = {
-                    username: username,
-                    isAdmin: result.isAdmin
-                };
-                login(userData);
-
-                if(result.isAdmin){
-                    this.props.history.push('/admin');
-                }
-                else{
-                    this.props.history.push('/person');
-                }
-            } else {
-                // console.log('Authentication failed: ', error);
-                this.setState(({
-                    errorMessage: 'Login failed, Please check your credentials.',
-                    errorStatus: status
-                }));
-            }
-        });
+        // const { username, password } = this.state;
+        // const { login } = this.context;
+        //
+        // if(username === '' || password === ''){
+        //     this.setState({ errorMessage: 'Please enter both username and password'});
+        //     return;
+        // }
+        //
+        // // console.log(`Inputs:\nusername: ${username}\npassword: ${password}`);
+        // API_USERS.authenticateUser(username, password, (result, status, error) => {
+        //     if (result !== null && (status === 200 || status === 202)) {
+        //         // console.log('Authentication successful');
+        //
+        //         const userData = {
+        //             username: username,
+        //             isAdmin: result.isAdmin
+        //         };
+        //         login(userData);
+        //
+        //         if(result.isAdmin){
+        //             this.props.history.push('/admin');
+        //         }
+        //         else{
+        //             this.props.history.push('/person');
+        //         }
+        //     } else {
+        //         // console.log('Authentication failed: ', error);
+        //         this.setState(({
+        //             errorMessage: 'Login failed, Please check your credentials.',
+        //             errorStatus: status
+        //         }));
+        //     }
+        // });
     }
 
     render() {
@@ -83,13 +83,13 @@ class Home extends React.Component {
             <div>
                 <Jumbotron fluid style={backgroundStyle}>
                     <Container fluid>
-                        <h1 className="display-3" style={textStyle}>Integrated Medical Monitoring Platform for Home-care assistance</h1>
-                        <p className="lead" style={textStyle}> <b>Enabling real time monitoring of patients, remote-assisted care services and
-                            smart intake mechanism for prescribed medication.</b> </p>
-                        <hr className="my-2"/>
-                        <p  style={textStyle}> <b>This assignment represents the first module of the distributed software system "Integrated
-                            Medical Monitoring Platform for Home-care assistance that represents the final project
-                            for the Distributed Systems course. </b> </p>
+                        {/*<h1 className="display-3" style={textStyle}>Integrated Medical Monitoring Platform for Home-care assistance</h1>*/}
+                        {/*<p className="lead" style={textStyle}> <b>Enabling real time monitoring of patients, remote-assisted care services and*/}
+                        {/*    smart intake mechanism for prescribed medication.</b> </p>*/}
+                        {/*<hr className="my-2"/>*/}
+                        {/*<p  style={textStyle}> <b>This assignment represents the first module of the distributed software system "Integrated*/}
+                        {/*    Medical Monitoring Platform for Home-care assistance that represents the final project*/}
+                        {/*    for the Distributed Systems course. </b> </p>*/}
                         <p className="lead">
                             <FormGroup id='authentication'>
                                 <Label for='usernameField'> Username: </Label>
@@ -137,4 +137,4 @@ class Home extends React.Component {
     };
 }
 
-export default withRouter(Home)
+export default withRouter(Login)

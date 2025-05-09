@@ -1,7 +1,7 @@
 import React from 'react';
 import validate from "./validators/person-validators";
 import Button from "react-bootstrap/Button";
-import * as API_USERS from "../api/people-api";
+import * as API_PEOPLE from "../api/people-api";
 import APIResponseErrorMessage from "../../commons/errorhandling/api-response-error-message";
 import {Col, Row} from "reactstrap";
 import { FormGroup, Input, Label} from 'reactstrap';
@@ -23,7 +23,7 @@ class DeletePersonForm extends React.Component {
             formIsValid: false,
 
             formControls: {
-                id:{
+                idPerson:{
                     value: '',
                     placeholder: 'ID of the user that you want to delete...',
                     valid: false,
@@ -71,8 +71,8 @@ class DeletePersonForm extends React.Component {
 
     };
 
-    removePerson(id) {
-        return API_USERS.deletePerson(id, (result, status, error) => {
+    removePerson(idPerson) {
+        return API_PEOPLE.deletePerson(idPerson, (result, status, error) => {
             if (result !== null && (status === 200 || status === 202)) {
                 // console.log("Successfully deleted person:" +
                 //     "\nusername: " + result.username +
@@ -101,17 +101,17 @@ class DeletePersonForm extends React.Component {
         return (
             <div>
 
-                <FormGroup id='id'>
-                    <Label for='idField'> ID: </Label>
-                    <Input name='id' id='idField' placeholder={this.state.formControls.id.placeholder}
+                <FormGroup id='idPerson'>
+                    <Label for='idPersonField'> ID Person: </Label>
+                    <Input name='idPerson' id='idPersonField' placeholder={this.state.formControls.idPerson.placeholder}
                            onChange={this.handleChange}
-                           defaultValue={this.state.formControls.id.value}
-                           touched={this.state.formControls.id.touched? 1 : 0}
-                           valid={this.state.formControls.id.valid}
+                           defaultValue={this.state.formControls.idPerson.value}
+                           touched={this.state.formControls.idPerson.touched? 1 : 0}
+                           valid={this.state.formControls.idPerson.valid}
                            required
                     />
-                    {this.state.formControls.id.touched && !this.state.formControls.id.valid &&
-                        <div className={"error-message row"}> * ID must have at least 1 characters </div>}
+                    {this.state.formControls.idPerson.touched && !this.state.formControls.idPerson.valid &&
+                        <div className={"error-message row"}> * ID Person must have at least 1 characters </div>}
                 </FormGroup>
 
                 <Row>
