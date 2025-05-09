@@ -27,8 +27,6 @@ const NavigationBar = () => (
             <NavbarBrand href="/">
                 <img
                     src={logo}
-                    // width={"35"}
-                    // height={"35"}
                     style={navBarLogoStyle}
                 />
             </NavbarBrand>
@@ -41,9 +39,16 @@ const NavigationBar = () => (
                     <DropdownMenu right >
 
                         <DropdownItem>
-                            <NavLink href="/admin">Admin Page</NavLink>
+                            <NavLink href="/admin">Admin</NavLink>
                         </DropdownItem>
 
+                        <DropdownItem>
+                            <NavLink href="/home">Home</NavLink>
+                        </DropdownItem>
+
+                        <DropdownItem>
+                            <NavLink href="/user">User</NavLink>
+                        </DropdownItem>
 
                     </DropdownMenu>
                 </UncontrolledDropdown>
