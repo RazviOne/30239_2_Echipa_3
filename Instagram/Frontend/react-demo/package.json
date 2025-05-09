@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@stomp/stompjs": "^7.1.1",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.6",
     "moment": "^2.23.0",
@@ -16,7 +17,8 @@
     "react-scripts": "^5.0.1",
     "react-table": "^6.10.0",
     "reactstrap": "^7.0.2",
-    "recharts": "latest"
+    "recharts": "latest",
+    "sockjs-client": "^1.6.1"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -228,7 +228,7 @@ class EditPersonForm extends React.Component {
 
     handleSubmit = () => {
         let person = {
-            personId: this.state.formControls.personId.value,
+            idPerson: this.state.formControls.idPerson.value,
             name: this.state.formControls.name.value,
             username: this.state.formControls.username.value,
             password: this.state.formControls.password.value,

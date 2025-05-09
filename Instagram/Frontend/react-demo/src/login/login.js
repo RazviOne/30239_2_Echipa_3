@@ -81,7 +81,7 @@ class Login extends React.Component {
 
         return (
             <div>
-                <Jumbotron fluid style={backgroundStyle}>
+                <Jumbotron fluid>
                     <Container fluid>
                         {/*<h1 className="display-3" style={textStyle}>Integrated Medical Monitoring Platform for Home-care assistance</h1>*/}
                         {/*<p className="lead" style={textStyle}> <b>Enabling real time monitoring of patients, remote-assisted care services and*/}

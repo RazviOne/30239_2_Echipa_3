@@ -64,7 +64,7 @@ class AdminContainer extends React.Component {
     }
 
     componentDidMount() {
-        this.protectRoute();
+        // this.protectRoute();
         this.fetchPersons();
         // this.fetchDevices();
         // this.fetchDeviceLinks();
@@ -99,6 +99,7 @@ class AdminContainer extends React.Component {
                     personTableData: result,
                     personTableIsLoaded: true,
                 });
+                console.log('Person table: ', this.state.personTableData);
             } else {
                 this.setState({
                     errorStatus: status,
@@ -218,7 +219,7 @@ class AdminContainer extends React.Component {
                         </Row>
                         <br />
                         <Row>
-                            <Col sm={{ size: '8', offset: 1 }}>
+                            <Col sm={{ size: '10' }}>
                                 {this.state.personTableIsLoaded && <PersonTable personTableData={this.state.personTableData} />}
                                 {this.state.errorStatus > 0 && (
                                     <APIResponseErrorMessage

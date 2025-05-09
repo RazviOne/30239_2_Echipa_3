@@ -94,7 +94,7 @@ class DeletePersonForm extends React.Component {
     handleSubmit() {
         // let personId = this.state.formControls.id.value;
         // console.log(personId);
-        this.removePerson(this.state.formControls.id.value);
+        this.removePerson(this.state.formControls.idPerson.value);
     }
 
     render() {

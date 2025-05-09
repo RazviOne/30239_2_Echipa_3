@@ -5,7 +5,7 @@ import Table from "../../commons/tables/table";
 const columns = [
     {
         Header: 'ID',
-        accessor: 'personId',
+        accessor: 'idPerson',
     },
     {
         Header: 'Name',
@@ -25,11 +25,13 @@ const columns = [
     },
     {
         Header: 'Admin',
-        accessor: 'isAdmin'
+        accessor: 'isAdmin',
+        Cell: ({ value }) => (value ? '✔' : '❌')
     },
     {
         Header: 'Banned',
-        accessor: 'isBanned'
+        accessor: 'isBanned',
+        Cell: ({ value }) => (value ? '✔' : '❌')
     },
     {
         Header: 'Email',

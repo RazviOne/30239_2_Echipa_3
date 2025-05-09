@@ -34,7 +34,7 @@ class PersonContainer extends React.Component {
 
     componentDidMount() {
         // console.log('componentDidMount()');
-        this.protectRoute();
+        // this.protectRoute();
         this.fetchPersons();
         this.connectWebSocket();
         this.connectChatWebSocket();
