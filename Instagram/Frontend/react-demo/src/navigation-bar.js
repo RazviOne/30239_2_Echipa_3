@@ -24,7 +24,7 @@ const navBarLogoStyle = {
 const NavigationBar = () => (
     <div>
         <Navbar color="dark" light expand="md">
-            <NavbarBrand href="/">
+            <NavbarBrand href="/home">
                 <img
                     src={logo}
                     style={navBarLogoStyle}

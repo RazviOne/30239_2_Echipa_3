@@ -17,7 +17,6 @@ class App extends React.Component {
             <div className={styles.back}>
                 <Router>
                     <div>
-                        <NavigationBar />
                         <Switch>
 
                             <Route

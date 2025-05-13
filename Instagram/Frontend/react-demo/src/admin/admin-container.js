@@ -26,6 +26,7 @@ import PersonTable from "./components/person-table";
 // import DeviceLinkTable from "./components/deviceLink-table";
 import { UserContext } from "../contexts/UserContext";
 import {HOST} from "../commons/hosts";
+import NavigationBar from "../navigation-bar";
 
 class AdminContainer extends React.Component {
     static contextType = UserContext;
@@ -197,6 +198,7 @@ class AdminContainer extends React.Component {
     render() {
         return (
             <div>
+                <NavigationBar/>
                 <div className="personDiv">
                     <CardHeader>
                         <strong>People Management</strong>

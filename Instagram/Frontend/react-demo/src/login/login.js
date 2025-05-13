@@ -2,9 +2,12 @@ import React from 'react';
 import { withRouter} from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import BackgroundImg from '../commons/images/future-medicine.jpg';
+import loginLogo from '../commons/images/Instagram_login_Logo.png';
+import instagramAppPhone from '../commons/images/instagram_phone_app.png'
 
-import {Button, Container, FormGroup, Input, Jumbotron, Label, Alert} from 'reactstrap';
+import {Button, Container, FormGroup, Input, Label, Alert, Card, Col, Row, CardFooter} from 'reactstrap';
 import * as API_USERS from "../admin/api/people-api";
+import {Text} from "recharts";
 
 const backgroundStyle = {
     backgroundPosition: 'center',
@@ -14,7 +17,7 @@ const backgroundStyle = {
     height: "1920px",
     backgroundImage: `url(${BackgroundImg})`
 };
-const textStyle = {color: 'white', };
+const textStyle = {color: 'white'};
 
 class Login extends React.Component {
 
@@ -41,39 +44,36 @@ class Login extends React.Component {
     }
 
     handleUserLogin(){
-        // const { username, password } = this.state;
-        // const { login } = this.context;
-        //
-        // if(username === '' || password === ''){
-        //     this.setState({ errorMessage: 'Please enter both username and password'});
-        //     return;
-        // }
-        //
-        // // console.log(`Inputs:\nusername: ${username}\npassword: ${password}`);
-        // API_USERS.authenticateUser(username, password, (result, status, error) => {
-        //     if (result !== null && (status === 200 || status === 202)) {
-        //         // console.log('Authentication successful');
-        //
-        //         const userData = {
-        //             username: username,
-        //             isAdmin: result.isAdmin
-        //         };
-        //         login(userData);
-        //
-        //         if(result.isAdmin){
-        //             this.props.history.push('/admin');
-        //         }
-        //         else{
-        //             this.props.history.push('/person');
-        //         }
-        //     } else {
-        //         // console.log('Authentication failed: ', error);
-        //         this.setState(({
-        //             errorMessage: 'Login failed, Please check your credentials.',
-        //             errorStatus: status
-        //         }));
-        //     }
-        // });
+        const { username, password } = this.state;
+        const { login } = this.context;
+
+        if(username === '' || password === ''){
+            this.setState({ errorMessage: 'Please enter both username and password'});
+            return;
+        }
+
+        alert(`Inputs:\nusername: ${username}\npassword: ${password}`);
+        API_USERS.authenticateUser(username, password, (result, status, error) => {
+            if (result !== null && (status === 200 || status === 202)) {
+                alert('Authentication successful');
+
+                // const userData = {
+                //     username: username,
+                //     isAdmin: result.isAdmin
+                // };
+                // login(userData);
+                this.props.history.push('/home');
+            } else {
+                alert('Authentication failed');
+                console.log('Error message:');
+                console.log(error);
+
+                this.setState(({
+                    errorMessage: 'Login failed, Please check your credentials.',
+                    errorStatus: status
+                }));
+            }
+        });
     }
 
     render() {
@@ -81,57 +81,127 @@ class Login extends React.Component {
 
         return (
             <div>
-                <Jumbotron fluid>
-                    <Container fluid>
-                        {/*<h1 className="display-3" style={textStyle}>Integrated Medical Monitoring Platform for Home-care assistance</h1>*/}
-                        {/*<p className="lead" style={textStyle}> <b>Enabling real time monitoring of patients, remote-assisted care services and*/}
-                        {/*    smart intake mechanism for prescribed medication.</b> </p>*/}
-                        {/*<hr className="my-2"/>*/}
-                        {/*<p  style={textStyle}> <b>This assignment represents the first module of the distributed software system "Integrated*/}
-                        {/*    Medical Monitoring Platform for Home-care assistance that represents the final project*/}
-                        {/*    for the Distributed Systems course. </b> </p>*/}
-                        <p className="lead">
-                            <FormGroup id='authentication'>
-                                <Label for='usernameField'> Username: </Label>
-                                <Input
-                                    type='text'
-                                    name='username'
-                                    id='usernameField'
-                                    value={username}
-                                    onChange={this.handleInputChange}
-                                    placeholder="Enter your username"
-                                    disabled={isLoading}
+                <div>
+                    <Row className={"align-items-center" + " justify-content-center"}>
+                        <Col sm="3">
+                            <Card className="border-white">
+                                <img
+                                    src={instagramAppPhone}
+                                    style={{
+                                        scale:"83%"
+                                    }}
                                 />
+                            </Card>
+                        </Col>
+                        <Col sm="3">
+                            <Card style={{
+                                width: '20rem',
+                                marginLeft: 'auto',
+                                marginRight: 'auto',
+                                marginTop: '5rem',
+                                textAlign: 'center'
+                            }}>
+                                <Container fluid>
+                                    <img
+                                        src={loginLogo}
+                                        style={{
+                                            marginTop: '2.5rem',
+                                            marginBottom: '2.5rem'
+                                        }}
+                                    />
+                                    <div className="lead">
+                                        <FormGroup id='authentication'>
+                                            <Input
+                                                type='text'
+                                                name='username'
+                                                id='usernameField'
+                                                value={username}
+                                                onChange={this.handleInputChange}
+                                                placeholder="Enter your username here"
+                                                disabled={isLoading}
+                                            />
 
-                                <Label for='passwordField'> Password: </Label>
-                                <Input
-                                    type='password'
-                                    name='password'
-                                    id='passwordField'
-                                    value={password}
-                                    onChange={this.handleInputChange}
-                                    placeholder="Enter your password"
-                                    disabled={isLoading}
-                                />
+                                            <div style={{height:"0.5rem"}}/>
 
-                                <Button
-                                    color="primary"
-                                    onClick={(e) => this.handleUserLogin(e)}
-                                    disabled={isLoading}
-                                >
-                                    Login
-                                </Button>
+                                            <Input
+                                                type='password'
+                                                name='password'
+                                                id='passwordField'
+                                                value={password}
+                                                onChange={this.handleInputChange}
+                                                placeholder="Enter your password here"
+                                                disabled={isLoading}
+                                            />
 
+                                            <div style={{height:"0.5rem"}}/>
 
-                            </FormGroup>
-                            {errorMessage && (
-                                <Alert color="danger" style={{ marginTop: '10px' }}>
-                                    {errorMessage}
-                                </Alert>
-                            )}
-                        </p>
-                    </Container>
-                </Jumbotron>
+                                            <Card style={{width: '91.5%', marginLeft: '4%'}}>
+                                                <Row>
+                                                    <Button
+                                                        color="primary"
+                                                        onClick={(e) => this.handleUserLogin(e)}
+                                                        disabled={isLoading}
+                                                    >
+                                                        Login
+                                                    </Button>
+                                                </Row>
+                                            </Card>
+
+                                        </FormGroup>
+
+                                        {errorMessage && (
+                                            <Alert color="danger" style={{ marginTop: '10px' }}>
+                                                {errorMessage}
+                                            </Alert>
+                                        )}
+                                    </div>
+                                </Container>
+                            </Card>
+                            <Card style={{
+                                width: '20rem',
+                                height: '5rem',
+                                marginLeft: 'auto',
+                                marginRight: 'auto',
+                                marginTop: '1rem',
+                                textAlign: 'center',
+                            }}>
+                                <div style={{
+                                    marginTop: 'auto',
+                                    marginBottom: 'auto'
+                                }}>
+
+                                    Don't have an account?
+                                    <Button
+                                        color="link"
+                                        onClick={(e) => {alert("Trebuie implementat")}}
+                                        disabled={isLoading}
+                                    >
+                                        Register
+                                    </Button>
+                                </div>
+                            </Card>
+                            <Card style={{
+                                width: '20rem',
+                                marginLeft: 'auto',
+                                marginRight: 'auto',
+                                marginTop: '1rem',
+                                textAlign: 'center',
+                            }}
+                                  className={"border-white"}
+                            >
+                                We don't have an app, we're broke
+                            </Card>
+                        </Col>
+                    </Row>
+                </div>
+                <div
+                    className="copyright"
+                    style={{textAlign:"center", marginTop: '5rem'}}
+                >
+                    <span>
+                        © 2025 Instagram from Echipa 3
+                    </span>
+                </div>
             </div>
         )
     };
