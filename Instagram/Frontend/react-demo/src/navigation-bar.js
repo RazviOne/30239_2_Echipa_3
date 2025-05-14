@@ -1,7 +1,9 @@
 import React from 'react'
 import logo from './commons/images/icon.png';
+import { withRouter } from 'react-router-dom';
 
 import {
+    Button,
     DropdownItem,
     DropdownMenu,
     DropdownToggle,
@@ -21,41 +23,53 @@ const navBarLogoStyle = {
     padding: '10px'
 };
 
-const NavigationBar = () => (
-    <div>
-        <Navbar color="dark" light expand="md">
-            <NavbarBrand href="/home">
-                <img
-                    src={logo}
-                    style={navBarLogoStyle}
-                />
-            </NavbarBrand>
-            <Nav className="mr-auto" navbar>
+class NavigationBar extends React.Component {
+    handleLogOut = () => {
+        this.props.history.push('/');
+    };
 
-                <UncontrolledDropdown nav inNavbar>
-                    <DropdownToggle style={textStyle} nav caret>
-                        Menu
-                    </DropdownToggle>
-                    <DropdownMenu right >
+    render() {
+        return (
+            <div>
+                <Navbar color="dark" light expand="md">
+                    <NavbarBrand href="/home">
+                        <img
+                            src={logo}
+                            style={navBarLogoStyle}
+                            alt="Logo"
+                        />
+                    </NavbarBrand>
+                    <Nav className="mr-auto" navbar>
+                        <UncontrolledDropdown nav inNavbar>
+                            <DropdownToggle style={textStyle} nav caret>
+                                Menu
+                            </DropdownToggle>
+                            <DropdownMenu right>
+                                <DropdownItem>
+                                    <NavLink href="/admin">Admin</NavLink>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <NavLink href="/home">Home</NavLink>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <NavLink href="/user">User</NavLink>
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </UncontrolledDropdown>
+                    </Nav>
 
-                        <DropdownItem>
-                            <NavLink href="/admin">Admin</NavLink>
-                        </DropdownItem>
+                    <Button
+                        color="danger"
+                        onClick={this.handleLogOut}
+                    >
+                        Log out
+                    </Button>
 
-                        <DropdownItem>
-                            <NavLink href="/home">Home</NavLink>
-                        </DropdownItem>
+                    <div style={{ marginRight: '10px' }} />
+                </Navbar>
+            </div>
+        );
+    }
+}
 
-                        <DropdownItem>
-                            <NavLink href="/user">User</NavLink>
-                        </DropdownItem>
-
-                    </DropdownMenu>
-                </UncontrolledDropdown>
-
-            </Nav>
-        </Navbar>
-    </div>
-);
-
-export default NavigationBar
+export default withRouter(NavigationBar)

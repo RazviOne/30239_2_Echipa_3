@@ -4,10 +4,22 @@ import { UserContext } from "../contexts/UserContext";
 import BackgroundImg from '../commons/images/future-medicine.jpg';
 import loginLogo from '../commons/images/Instagram_login_Logo.png';
 import instagramAppPhone from '../commons/images/instagram_phone_app.png'
+import RegisterPersonForm from "./components/register-person-form";
+import Notification from "./components/notification";
 
-import {Button, Container, FormGroup, Input, Label, Alert, Card, Col, Row, CardFooter} from 'reactstrap';
+import {
+    Button,
+    Container,
+    FormGroup,
+    Input,
+    Alert,
+    Card,
+    Col,
+    Row,
+    ModalHeader,
+    ModalBody, Modal
+} from 'reactstrap';
 import * as API_USERS from "../admin/api/people-api";
-import {Text} from "recharts";
 
 const backgroundStyle = {
     backgroundPosition: 'center',
@@ -25,7 +37,16 @@ class Login extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.toggleRegisterPersonForm = this.toggleRegisterPersonForm.bind(this);
+        this.handleUserSignUp = this.handleUserSignUp.bind(this)
+        this.dismissNotification = this.dismissNotification.bind(this);
+        this.reload = this.reload.bind(this);
+
         this.state = {
+            showRegisterPersonForm: false,
+            collapseForm: false,
+            notification: false,
             username: '',
             password: '',
             errorMessage: '',
@@ -35,7 +56,7 @@ class Login extends React.Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleUserLogin = this.handleUserLogin.bind(this);
 
-        // console.log(`Page loaded.\nUsername: ${this.state.username}\npassword: ${this.state.password}`);
+        // alert(`Page loaded.\nUsername: ${this.state.username}\npassword: ${this.state.password}`);
     }
 
     handleInputChange(event) {
@@ -52,10 +73,10 @@ class Login extends React.Component {
             return;
         }
 
-        alert(`Inputs:\nusername: ${username}\npassword: ${password}`);
+        // alert(`Inputs:\nusername: ${username}\npassword: ${password}`);
         API_USERS.authenticateUser(username, password, (result, status, error) => {
             if (result !== null && (status === 200 || status === 202)) {
-                alert('Authentication successful');
+                // alert('Authentication successful');
 
                 // const userData = {
                 //     username: username,
@@ -64,7 +85,7 @@ class Login extends React.Component {
                 // login(userData);
                 this.props.history.push('/home');
             } else {
-                alert('Authentication failed');
+                // alert('Authentication failed');
                 console.log('Error message:');
                 console.log(error);
 
@@ -76,11 +97,39 @@ class Login extends React.Component {
         });
     }
 
+    handleUserSignUp(){
+        this.setState({notification: true});
+
+        this.reload();
+    }
+
+    dismissNotification(){
+        this.setState({
+            notification: false
+        });
+    }
+
+    toggleRegisterPersonForm() {
+        this.setState({ showRegisterPersonForm: !this.state.showRegisterPersonForm });
+    }
+
+    reload(){
+        this.setState({
+            showRegisterPersonForm: false,
+            collapseForm: false,
+            username: '',
+            password: '',
+        });
+    }
+
     render() {
         const { username, password, errorMessage, isLoading } = this.state;
 
         return (
             <div>
+                <div>
+                    {this.state.notification && (<Notification onClose={this.dismissNotification}/>)}
+                </div>
                 <div>
                     <Row className={"align-items-center" + " justify-content-center"}>
                         <Col sm="3">
@@ -93,12 +142,12 @@ class Login extends React.Component {
                                 />
                             </Card>
                         </Col>
+
                         <Col sm="3">
                             <Card style={{
                                 width: '20rem',
                                 marginLeft: 'auto',
                                 marginRight: 'auto',
-                                marginTop: '5rem',
                                 textAlign: 'center'
                             }}>
                                 <Container fluid>
@@ -133,7 +182,7 @@ class Login extends React.Component {
                                                 disabled={isLoading}
                                             />
 
-                                            <div style={{height:"0.5rem"}}/>
+                                            <div style={{height:"1rem"}}/>
 
                                             <Card style={{width: '91.5%', marginLeft: '4%'}}>
                                                 <Row>
@@ -142,7 +191,7 @@ class Login extends React.Component {
                                                         onClick={(e) => this.handleUserLogin(e)}
                                                         disabled={isLoading}
                                                     >
-                                                        Login
+                                                        Log in
                                                     </Button>
                                                 </Row>
                                             </Card>
@@ -157,6 +206,7 @@ class Login extends React.Component {
                                     </div>
                                 </Container>
                             </Card>
+
                             <Card style={{
                                 width: '20rem',
                                 height: '5rem',
@@ -173,13 +223,26 @@ class Login extends React.Component {
                                     Don't have an account?
                                     <Button
                                         color="link"
-                                        onClick={(e) => {alert("Trebuie implementat")}}
+                                        onClick={(e) => this.toggleRegisterPersonForm()}
                                         disabled={isLoading}
                                     >
-                                        Register
+                                        Sign up
                                     </Button>
                                 </div>
                             </Card>
+
+                            <Modal
+                                isOpen={this.state.showRegisterPersonForm}
+                                toggle={this.toggleRegisterPersonForm}
+                                className={this.props.className}
+                                size="lg"
+                            >
+                                <ModalHeader toggle={this.toggleRegisterPersonForm}>Register User:</ModalHeader>
+                                <ModalBody>
+                                    <RegisterPersonForm reloadHandler={this.handleUserSignUp} />
+                                </ModalBody>
+                            </Modal>
+
                             <Card style={{
                                 width: '20rem',
                                 marginLeft: 'auto',
