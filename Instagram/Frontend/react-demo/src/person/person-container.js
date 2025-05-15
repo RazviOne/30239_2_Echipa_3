@@ -3,6 +3,8 @@ import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import APIResponseErrorMessage from "../commons/errorhandling/api-response-error-message";
 import { Card, CardHeader, Col, Row } from 'reactstrap';
+import Feed from '../posts/feed';
+
 
 import {HOST} from "../commons/hosts";
 import * as API_USERS from "./api/person-api";
@@ -261,6 +263,14 @@ class PersonContainer extends React.Component {
                     <br />
                     <Row>
                         <Col><strong>Devices</strong></Col>
+                    </Row>
+                    <Row>
+                        <Col><strong>Postări</strong></Col>
+                        </Row>
+                        <Row>
+                        <Col sm={{ size: '8', offset: 1 }}>
+                            <Feed />
+                        </Col>
                     </Row>
                     <Row>
                         <Col sm={{ size: '8', offset: 1 }}>

@@ -4,6 +4,7 @@ import NavigationBar from './navigation-bar'
 import Login from './login/login';
 import PersonContainer from './person/person-container'
 import AdminContainer from './admin/admin-container'
+import Feed from './posts/feed';
 
 import ErrorPage from './commons/errorhandling/error-page';
 import styles from './commons/styles/project-style.css';
@@ -47,6 +48,18 @@ class App extends React.Component {
                                 exact
                                 path='/admin'
                                 component={AdminContainer}
+                            />
+
+                            <Route 
+                                exact 
+                                path='/home' 
+                                component={Feed} 
+                            />
+
+                            <Route 
+                                exact 
+                                path='/profile' 
+                                component={PersonContainer}
                             />
 
                             {/*Error*/}
