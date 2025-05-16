@@ -108,6 +108,7 @@ function Feed() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                marginTop: '1rem',
                 marginBottom: '2rem',
                 borderBottom: '1px solid #ddd',
                 paddingBottom: '1rem'
