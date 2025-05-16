@@ -5,6 +5,7 @@ import * as API_USERS from '../admin/api/people-api';
 import { Card, CardBody, CardTitle, CardText } from 'reactstrap';
 import LogoImg from '../commons/images/Instagram_login_Logo.png';
 import UserImg from '../commons/images/user.png';
+import NavigationBar from "../navigation-bar";
 
 function Feed() {
     const [posts, setPosts] = useState([]);
@@ -101,6 +102,7 @@ function Feed() {
 
     return (
         <div style={{ padding: '1rem 10%', backgroundColor: '#fafafa' }}>
+            <NavigationBar/>
             {/* HEADER */}
             <div style={{
                 display: 'flex',
