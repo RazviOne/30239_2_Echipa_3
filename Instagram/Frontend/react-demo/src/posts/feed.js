@@ -101,32 +101,19 @@ function Feed() {
     };
 
     return (
-        <div style={{ padding: '1rem 10%', backgroundColor: '#fafafa' }}>
-            <NavigationBar/>
-            {/* HEADER */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '1rem',
-                marginBottom: '2rem',
-                borderBottom: '1px solid #ddd',
-                paddingBottom: '1rem'
-            }}>
-                <img src={LogoImg} alt="Instagram Logo" style={{ height: '50px' }} />
-                <img
-                    src={UserImg}
-                    alt="Profil"
-                    style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        objectFit: 'cover'
-                    }}
-                />
-            </div>
-
-            {/* FEED */}
+  <>
+    <NavigationBar />
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '1rem 10%',
+        backgroundColor: '#fafafa',
+        minHeight: '100vh'
+      }}
+    >
+        {/* FEED */}
             {posts.length === 0 && <p>Nu există postări momentan.</p>}
 
             {posts
@@ -166,10 +153,11 @@ function Feed() {
                             </CardBody>
                         </Card>
                     )
-                }
-            )}
-        </div>
-    );
+                })}
+    </div>
+  </>
+);
+
 }
 
 export default Feed;

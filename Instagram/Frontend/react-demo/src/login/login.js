@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter} from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
-import BackgroundImg from '../commons/images/future-medicine.jpg';
+// import BackgroundImg from '../commons/images/future-medicine.jpg';
 import loginLogo from '../commons/images/Instagram_login_Logo.png';
 import instagramAppPhone from '../commons/images/instagram_phone_app.png'
 import RegisterPersonForm from "./components/register-person-form";
@@ -27,7 +27,7 @@ const backgroundStyle = {
     backgroundRepeat: 'no-repeat',
     width: "100%",
     height: "1920px",
-    backgroundImage: `url(${BackgroundImg})`
+    // backgroundImage: `url(${BackgroundImg})`
 };
 const textStyle = {color: 'white'};
 

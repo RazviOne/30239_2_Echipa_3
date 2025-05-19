@@ -248,8 +248,9 @@ class PersonContainer extends React.Component {
                     ))}
                 </div>
                 <CardHeader>
-                     <strong> Welcome {user.username} </strong>
+                    <strong> Welcome {user ? user.username : ''} </strong>
                 </CardHeader>
+
                 <Card>
                     <Row>
                         <Col>Name: {this.state.personName}</Col>
