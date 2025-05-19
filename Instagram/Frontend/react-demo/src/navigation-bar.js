@@ -50,7 +50,7 @@ class NavigationBar extends React.Component {
             flex: 1,
             }}
         >
-        <img
+            <img
             src={InstaIcon}
             alt="Logo"
             style={{ height: '40px', cursor: 'pointer' }}

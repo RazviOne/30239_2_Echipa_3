@@ -132,19 +132,22 @@ function Feed() {
                                     {usernames[post.idPerson] || 'Utilizator necunoscut'} - {timeAgo(post.dateCreated)}
                                 </div>
 
-                                {post.image && (
+                                {imageSource && (
                                     <img
                                         src={imageSource}
                                         alt="Post"
                                         style={{
                                             maxHeight: '40rem',
-                                            maxWidth: '40rem',
+                                            maxWidth: '100%',
                                             objectFit: 'cover',
                                             borderRadius: '8px',
                                             marginBottom: '1rem'
                                         }}
                                     />
                                 )}
+
+                                
+
 
                                 <CardTitle tag="h5" style={{marginBottom: '0.5rem'}}>
                                     {post.title}
