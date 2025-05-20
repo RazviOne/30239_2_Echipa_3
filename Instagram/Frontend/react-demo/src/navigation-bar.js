@@ -82,8 +82,8 @@ class NavigationBar extends React.Component {
                 <DropdownItem onClick={() => this.props.history.push('/home')}>Feed</DropdownItem>
                 <DropdownItem onClick={() => this.props.history.push('/profile')}>Profile</DropdownItem>
                 <DropdownItem onClick={() => this.props.history.push('/admin')}>Admin</DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem onClick={this.logout}>Log out</DropdownItem>
+                {/* <DropdownItem divider />
+                <DropdownItem onClick={this.logout}>Log out</DropdownItem> */}
             </DropdownMenu>
             </Dropdown>
         </div>
