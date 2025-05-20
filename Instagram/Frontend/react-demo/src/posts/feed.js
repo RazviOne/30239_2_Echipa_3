@@ -126,7 +126,18 @@ function Feed() {
                 }
 
                 return (
-                        <Card key={idx} style={{marginBottom: '2rem', padding: '1rem', maxWidth: '45rem'}}>
+                        <Card
+                            key={idx}
+                            onClick={() => window.location.href = `/post/${post.idPost}`}
+                            style={{
+                                marginBottom: '2rem',
+                                padding: '1rem',
+                                maxWidth: '45rem',
+                                cursor: 'pointer',
+                                transition: '0.3s',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
+                            }}
+                        >
                             <CardBody style={{marginLeft: 'auto', marginRight: 'auto'}}>
                                 <div style={{fontWeight: 'bold', marginBottom: '0.5rem'}}>
                                     {usernames[post.idPerson] || 'Utilizator necunoscut'} - {timeAgo(post.dateCreated)}

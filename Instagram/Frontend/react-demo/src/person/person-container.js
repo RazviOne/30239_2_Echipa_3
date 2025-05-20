@@ -4,6 +4,7 @@ import { Client } from '@stomp/stompjs';
 import APIResponseErrorMessage from "../commons/errorhandling/api-response-error-message";
 import { Card, CardHeader, Col, Row } from 'reactstrap';
 import Feed from '../posts/feed';
+import NavigationBar from '../navigation-bar';
 
 
 import {HOST} from "../commons/hosts";
@@ -119,32 +120,35 @@ class PersonContainer extends React.Component {
         // console.log('render()');
         const { user } = this.context;
         return (
-            <div>
-                <CardHeader>
-                    <strong> Welcome {user ? user.username : ''} </strong>
-                </CardHeader>
+            <>
+                <NavigationBar />
+                <div>
+                    <CardHeader>
+                        <strong> Welcome {user ? user.username : ''} </strong>
+                    </CardHeader>
 
-                <Card>
-                    <Row>
-                        <Col>Name: {this.state.personName}</Col>
-                    </Row>
-                    <Row>
-                        <Col>Address: {this.state.personAddress}</Col>
-                    </Row>
-                    <Row>
-                        <Col>Age: {this.state.personAge}</Col>
-                    </Row>
-                    <br />
-                    <Row>
-                        <Col><strong>Postări</strong></Col>
-                    </Row>
-                    {/*<Row>*/}
-                    {/*    <Col sm={{ size: '8', offset: 1 }}>*/}
-                    {/*        <Feed />*/}
-                    {/*    </Col>*/}
-                    {/*</Row>*/}
-                </Card>
-            </div>
+                    <Card>
+                        <Row>
+                            <Col>Name: {this.state.personName}</Col>
+                        </Row>
+                        <Row>
+                            <Col>Address: {this.state.personAddress}</Col>
+                        </Row>
+                        <Row>
+                            <Col>Age: {this.state.personAge}</Col>
+                        </Row>
+                        <br />
+                        <Row>
+                            <Col><strong>Postări</strong></Col>
+                        </Row>
+                        {/*<Row>*/}
+                        {/*    <Col sm={{ size: '8', offset: 1 }}>*/}
+                        {/*        <Feed />*/}
+                        {/*    </Col>*/}
+                        {/*</Row>*/}
+                    </Card>
+                </div>
+            </>
         );
     }
 }

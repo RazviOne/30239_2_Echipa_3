@@ -5,6 +5,7 @@ import Login from './login/login';
 import PersonContainer from './person/person-container'
 import AdminContainer from './admin/admin-container'
 import Feed from './posts/feed';
+import PostDetails from './posts/post-details';
 
 import ErrorPage from './commons/errorhandling/error-page';
 import styles from './commons/styles/project-style.css';
@@ -60,6 +61,12 @@ class App extends React.Component {
                                 exact 
                                 path='/profile' 
                                 component={PersonContainer}
+                            />
+                            
+                            <Route
+                                exact
+                                path="/post/:id"
+                                component={PostDetails} 
                             />
 
                             {/*Error*/}
