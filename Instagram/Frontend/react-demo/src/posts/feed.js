@@ -140,7 +140,7 @@ function Feed() {
                         >
                             <CardBody style={{marginLeft: 'auto', marginRight: 'auto'}}>
                                 <div style={{fontWeight: 'bold', marginBottom: '0.5rem'}}>
-                                    {usernames[post.idPerson] || 'Utilizator necunoscut'} - {timeAgo(post.dateCreated)}
+                                    {usernames[post.idPerson]}<span style={{ color: 'gray', fontSize: '0.9rem' }}> • {timeAgo(post.dateCreated)}</span>
                                 </div>
 
                                 {imageSource && (
