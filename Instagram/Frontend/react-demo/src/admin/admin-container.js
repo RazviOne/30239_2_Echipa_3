@@ -13,17 +13,13 @@ import {
 import AddPersonForm from "./components/add-person-form";
 import DeletePersonForm from "./components/delete-person-form";
 import EditPersonForm from "./components/edit-person-form";
-// import AddPostForm from "./components/add-post-form";
-// import DeleteDeviceForm from "./components/delete-device-form";
-// import EditDeviceForm from "./components/edit-device-form";
-// import AddDeviceLinkForm from "./components/add-deviceLink-form";
-// import DeleteDeviceLinkForm from "./components/delete-deviceLink-form";
+import AddTagForm from "./components/add-tag-form";
+import DeleteTagForm from "./components/delete-tag-form";
+// import EditTagForm from "./components/edit-tag-form";
 import * as API_PEOPLE from "./api/people-api";
-import * as API_POSTS from "./api/posts-api"
-import * as API_REACTIONS from "./api/reactions-api"
+import * as API_TAGS from "./api/tags-api"
 import PersonTable from "./components/person-table";
-// import DeviceTable from "./components/device-table";
-// import DeviceLinkTable from "./components/deviceLink-table";
+import TagTable from "./components/tag-table";
 import { UserContext } from "../contexts/UserContext";
 import {HOST} from "../commons/hosts";
 import NavigationBar from "../navigation-bar";
@@ -36,29 +32,23 @@ class AdminContainer extends React.Component {
         this.toggleAddPersonForm = this.toggleAddPersonForm.bind(this);
         this.toggleDeletePersonForm = this.toggleDeletePersonForm.bind(this);
         this.toggleEditPersonForm = this.toggleEditPersonForm.bind(this);
-        // this.toggleAddDeviceForm = this.toggleAddDeviceForm.bind(this);
-        // this.toggleDeleteDeviceForm = this.toggleDeleteDeviceForm.bind(this);
-        // this.toggleEditDeviceForm = this.toggleEditDeviceForm.bind(this);
-        // this.toggleAddDeviceLinkForm = this.toggleAddDeviceLinkForm.bind(this);
-        // this.toggleDeleteDeviceLinkForm = this.toggleDeleteDeviceLinkForm.bind(this);
+        this.toggleAddTagForm = this.toggleAddTagForm.bind(this);
+        this.toggleDeleteTagForm = this.toggleDeleteTagForm.bind(this);
+        // this.toggleEditTagForm = this.toggleEditTagForm.bind(this);
         this.reload = this.reload.bind(this);
 
         this.state = {
             showAddPersonForm: false,
             showDeletePersonForm: false,
             showEditPersonForm: false,
-            // showAddDeviceForm: false,
-            // showDeleteDeviceForm: false,
-            // showEditDeviceForm: false,
-            // showAddDeviceLinkForm: false,
-            // showDeleteDeviceLinkForm: false,
+            showAddTagForm: false,
+            showDeleteTagForm: false,
+            // showEditTagForm: false,
             collapseForm: false,
             personTableData: [],
-            // deviceTableData: [],
-            // deviceLinkTableData: [],
+            tagTableData: [],
             personTableIsLoaded: false,
-            // deviceTableIsLoaded: false,
-            // deviceLinkTableIsLoaded: false,
+            tagTableIsLoaded: false,
             errorStatus: 0,
             error: null,
         };
@@ -67,8 +57,7 @@ class AdminContainer extends React.Component {
     componentDidMount() {
         // this.protectRoute();
         this.fetchPersons();
-        // this.fetchDevices();
-        // this.fetchDeviceLinks();
+        this.fetchTags();
     }
 
     // protectRoute() {
@@ -100,7 +89,7 @@ class AdminContainer extends React.Component {
                     personTableData: result,
                     personTableIsLoaded: true,
                 });
-                console.log('Person table: ', this.state.personTableData);
+                // console.log('Person table: ', this.state.personTableData);
             } else {
                 this.setState({
                     errorStatus: status,
@@ -110,39 +99,22 @@ class AdminContainer extends React.Component {
         });
     }
 
-    // fetchDevices() {
-    //     return API_DEVICES.getDevices((result, status, err) => {
-    //         // console.log(result);
-    //         if (result !== null && status === 200) {
-    //             this.setState({
-    //                 deviceTableData: result,
-    //                 deviceTableIsLoaded: true,
-    //             });
-    //         } else {
-    //             this.setState({
-    //                 errorStatus: status,
-    //                 error: err,
-    //             });
-    //         }
-    //     });
-    // }
-
-    // fetchDeviceLinks() {
-    //     return API_DEVICELINKS.getDeviceLinks((result, status, err) => {
-    //         // console.log(result);
-    //         if (result !== null && status === 200) {
-    //             this.setState({
-    //                 deviceLinkTableData: result,
-    //                 deviceLinkTableIsLoaded: true,
-    //             });
-    //         } else {
-    //             this.setState({
-    //                 errorStatus: status,
-    //                 error: err,
-    //             });
-    //         }
-    //     });
-    // }
+    fetchTags() {
+        return API_TAGS.getTags((result, status, err) => {
+            // console.log(result);
+            if (result !== null && status === 200) {
+                this.setState({
+                    tagTableData: result,
+                    tagTableIsLoaded: true,
+                });
+            } else {
+                this.setState({
+                    errorStatus: status,
+                    error: err,
+                });
+            }
+        });
+    }
 
     toggleAddPersonForm() {
         this.setState({ showAddPersonForm: !this.state.showAddPersonForm });
@@ -156,43 +128,32 @@ class AdminContainer extends React.Component {
         this.setState({ showEditPersonForm: !this.state.showEditPersonForm });
     }
 
-    // toggleAddDeviceForm() {
-    //     this.setState({ showAddDeviceForm: !this.state.showAddDeviceForm });
+    toggleAddTagForm() {
+        this.setState({ showAddTagForm: !this.state.showAddTagForm });
+    }
+
+    toggleDeleteTagForm() {
+        this.setState({ showDeleteTagForm: !this.state.showDeleteTagForm });
+    }
+
+    // toggleEditTagForm() {
+    //     this.setState({ showEditTagForm: !this.state.showEditTagForm });
     // }
-    //
-    // toggleDeleteDeviceForm() {
-    //     this.setState({ showDeleteDeviceForm: !this.state.showDeleteDeviceForm });
-    // }
-    //
-    // toggleEditDeviceForm() {
-    //     this.setState({ showEditDeviceForm: !this.state.showEditDeviceForm });
-    // }
-    //
-    // toggleAddDeviceLinkForm() {
-    //     this.setState({ showAddDeviceLinkForm: !this.state.showAddDeviceLinkForm });
-    // }
-    //
-    // toggleDeleteDeviceLinkForm() {
-    //     this.setState({ showDeleteDeviceLinkForm: !this.state.showDeleteDeviceLinkForm });
-    // }
+
 
     reload() {
         this.setState({
             personTableIsLoaded: false,
-            // deviceTableIsLoaded: false,
-            // deviceLinkTableIsLoaded: false,
+            tagTableIsLoaded: false,
             showAddPersonForm: false,
             showDeletePersonForm: false,
             showEditPersonForm: false,
-            // showAddDeviceForm: false,
-            // showDeleteDeviceForm: false,
-            // showEditDeviceForm: false,
-            // showAddDeviceLinkForm: false,
-            // showDeleteDeviceLinkForm: false
+            showAddTagForm: false,
+            showDeleteTagForm: false,
+            // showEditTagForm: false,
         });
         this.fetchPersons();
-        // this.fetchDevices();
-        // this.fetchDeviceLinks();
+        this.fetchTags();
     }
 
     render() {
@@ -201,13 +162,14 @@ class AdminContainer extends React.Component {
                 <NavigationBar/>
                 <div className="personDiv">
                     <CardHeader>
-                        <strong>People Management</strong>
+                        <strong>Users Management</strong>
                     </CardHeader>
 
                     <Card>
                         <br />
                         <Row>
-                            <Col sm={{ size: '8', offset: 1 }}>
+                            <div style={{width: '2rem'}}/>
+                            <Col sm={{ size: '8' }}>
                                 <Button color="primary" onClick={this.toggleAddPersonForm}>
                                     Add Person
                                 </Button>{' '}
@@ -221,6 +183,7 @@ class AdminContainer extends React.Component {
                         </Row>
                         <br />
                         <Row>
+                            <div style={{width: '1rem'}}/>
                             <Col sm={{ size: '10' }}>
                                 {this.state.personTableIsLoaded && <PersonTable personTableData={this.state.personTableData} />}
                                 {this.state.errorStatus > 0 && (
@@ -270,132 +233,78 @@ class AdminContainer extends React.Component {
                     </Modal>
                 </div>
 
-                {/*<div className="deviceDiv">*/}
-                {/*    <CardHeader>*/}
-                {/*        <strong>Device Management</strong>*/}
-                {/*    </CardHeader>*/}
+                <div className="tagDiv">
+                    <CardHeader>
+                        <strong>Tags Management</strong>
+                    </CardHeader>
 
-                {/*    <Card>*/}
-                {/*        <br />*/}
-                {/*        <Row>*/}
-                {/*            <Col sm={{ size: '8', offset: 1 }}>*/}
-                {/*                <Button color="primary" onClick={this.toggleAddDeviceForm}>*/}
-                {/*                    Add Device*/}
-                {/*                </Button>{' '}*/}
-                {/*                <Button color="secondary" onClick={this.toggleEditDeviceForm}>*/}
-                {/*                    Edit Device*/}
-                {/*                </Button>{' '}*/}
-                {/*                <Button color="danger" onClick={this.toggleDeleteDeviceForm}>*/}
-                {/*                    Delete Device*/}
-                {/*                </Button>*/}
-                {/*            </Col>*/}
-                {/*        </Row>*/}
-                {/*        <br />*/}
-                {/*        <Row>*/}
-                {/*            <Col sm={{ size: '8', offset: 1 }}>*/}
-                {/*                {this.state.deviceTableIsLoaded && <DeviceTable deviceTableData={this.state.deviceTableData} />}*/}
-                {/*                {this.state.errorStatus > 0 && (*/}
-                {/*                    <APIResponseErrorMessage*/}
-                {/*                        errorStatus={this.state.errorStatus}*/}
-                {/*                        error={this.state.error}*/}
-                {/*                    />*/}
-                {/*                )}*/}
-                {/*            </Col>*/}
-                {/*        </Row>*/}
-                {/*    </Card>*/}
+                    <Card>
+                        <br />
+                        <Row>
+                            <div style={{width: '2rem'}}/>
+                            <Col sm={{ size: '8' }}>
+                                <Button color="primary" onClick={this.toggleAddTagForm}>
+                                    Add Tag
+                                </Button>{' '}
+                                {/*<Button color="secondary" onClick={this.toggleEditTagForm}>*/}
+                                {/*    Edit Tag*/}
+                                {/*</Button>{' '}*/}
+                                <Button color="danger" onClick={this.toggleDeleteTagForm}>
+                                    Delete Tag
+                                </Button>
+                            </Col>
+                        </Row>
+                        <br />
+                        <Row>
+                            <div style={{width: '1rem'}}/>
+                            <Col sm={{ size: '10' }}>
+                                {this.state.tagTableIsLoaded && <TagTable tagTableData={this.state.tagTableData} />}
+                                {this.state.errorStatus > 0 && (
+                                    <APIResponseErrorMessage
+                                        errorStatus={this.state.errorStatus}
+                                        error={this.state.error}
+                                    />
+                                )}
+                            </Col>
+                        </Row>
+                    </Card>
 
-                {/*    <Modal*/}
-                {/*        isOpen={this.state.showAddDeviceForm}*/}
-                {/*        toggle={this.toggleAddDeviceForm}*/}
-                {/*        className={this.props.className}*/}
-                {/*        size="lg"*/}
-                {/*    >*/}
-                {/*        <ModalHeader toggle={this.toggleAddDeviceForm}>Add Device:</ModalHeader>*/}
-                {/*        <ModalBody>*/}
-                {/*            <AddPostForm reloadHandler={this.reload} />*/}
-                {/*        </ModalBody>*/}
-                {/*    </Modal>*/}
+                    <Modal
+                        isOpen={this.state.showAddTagForm}
+                        toggle={this.toggleAddTagForm}
+                        className={this.props.className}
+                        size="lg"
+                    >
+                        <ModalHeader toggle={this.toggleAddTagForm}>Add Tag:</ModalHeader>
+                        <ModalBody>
+                            <AddTagForm reloadHandler={this.reload} />
+                        </ModalBody>
+                    </Modal>
 
-                {/*    <Modal*/}
-                {/*        isOpen={this.state.showEditDeviceForm}*/}
-                {/*        toggle={this.toggleEditDeviceForm}*/}
-                {/*        className={this.props.className}*/}
-                {/*        size="lg"*/}
-                {/*    >*/}
-                {/*        <ModalHeader toggle={this.toggleEditDeviceForm}>Edit Device:</ModalHeader>*/}
-                {/*        <ModalBody>*/}
-                {/*            <EditDeviceForm reloadHandler={this.reload} />*/}
-                {/*        </ModalBody>*/}
-                {/*    </Modal>*/}
+                    {/*<Modal*/}
+                    {/*    isOpen={this.state.showEditTagForm}*/}
+                    {/*    toggle={this.toggleEditTagForm}*/}
+                    {/*    className={this.props.className}*/}
+                    {/*    size="lg"*/}
+                    {/*>*/}
+                    {/*    <ModalHeader toggle={this.toggleEditTagForm}>Edit Tag:</ModalHeader>*/}
+                    {/*    <ModalBody>*/}
+                    {/*        <EditTagForm reloadHandler={this.reload} />*/}
+                    {/*    </ModalBody>*/}
+                    {/*</Modal>*/}
 
-                {/*    <Modal*/}
-                {/*        isOpen={this.state.showDeleteDeviceForm}*/}
-                {/*        toggle={this.toggleDeleteDeviceForm}*/}
-                {/*        className={this.props.className}*/}
-                {/*        size="lg"*/}
-                {/*    >*/}
-                {/*        <ModalHeader toggle={this.toggleDeleteDeviceForm}>Delete Device:</ModalHeader>*/}
-                {/*        <ModalBody>*/}
-                {/*            <DeleteDeviceForm reloadHandler={this.reload} />*/}
-                {/*        </ModalBody>*/}
-                {/*    </Modal>*/}
-                {/*</div>*/}
-
-                {/*<div className="deviceLinkDiv">*/}
-                {/*    <CardHeader>*/}
-                {/*        <strong>Device Link Management</strong>*/}
-                {/*    </CardHeader>*/}
-
-                {/*    <Card>*/}
-                {/*        <br />*/}
-                {/*        <Row>*/}
-                {/*            <Col sm={{ size: '8', offset: 1 }}>*/}
-                {/*                <Button color="primary" onClick={this.toggleAddDeviceLinkForm}>*/}
-                {/*                    Add Device Link*/}
-                {/*                </Button>{' '}*/}
-                {/*                <Button color="danger" onClick={this.toggleDeleteDeviceLinkForm}>*/}
-                {/*                    Delete Device Link*/}
-                {/*                </Button>*/}
-                {/*            </Col>*/}
-                {/*        </Row>*/}
-                {/*        <br />*/}
-                {/*        <Row>*/}
-                {/*            <Col sm={{ size: '8', offset: 1 }}>*/}
-                {/*                {this.state.deviceLinkTableIsLoaded && <DeviceLinkTable deviceLinkTableData={this.state.deviceLinkTableData} />}*/}
-                {/*                {this.state.errorStatus > 0 && (*/}
-                {/*                    <APIResponseErrorMessage*/}
-                {/*                        errorStatus={this.state.errorStatus}*/}
-                {/*                        error={this.state.error}*/}
-                {/*                    />*/}
-                {/*                )}*/}
-                {/*            </Col>*/}
-                {/*        </Row>*/}
-                {/*    </Card>*/}
-
-                {/*    <Modal*/}
-                {/*        isOpen={this.state.showAddDeviceLinkForm}*/}
-                {/*        toggle={this.toggleAddDeviceLinkForm}*/}
-                {/*        className={this.props.className}*/}
-                {/*        size="lg"*/}
-                {/*    >*/}
-                {/*        <ModalHeader toggle={this.toggleAddDeviceLinkForm}>Add Device Link:</ModalHeader>*/}
-                {/*        <ModalBody>*/}
-                {/*            <AddDeviceLinkForm reloadHandler={this.reload} />*/}
-                {/*        </ModalBody>*/}
-                {/*    </Modal>*/}
-
-                {/*    <Modal*/}
-                {/*        isOpen={this.state.showDeleteDeviceLinkForm}*/}
-                {/*        toggle={this.toggleDeleteDeviceLinkForm}*/}
-                {/*        className={this.props.className}*/}
-                {/*        size="lg"*/}
-                {/*    >*/}
-                {/*        <ModalHeader toggle={this.toggleDeleteDeviceLinkForm}>Delete Device Link:</ModalHeader>*/}
-                {/*        <ModalBody>*/}
-                {/*            <DeleteDeviceLinkForm reloadHandler={this.reload} />*/}
-                {/*        </ModalBody>*/}
-                {/*    </Modal>*/}
-                {/*</div>*/}
+                    <Modal
+                        isOpen={this.state.showDeleteTagForm}
+                        toggle={this.toggleDeleteTagForm}
+                        className={this.props.className}
+                        size="lg"
+                    >
+                        <ModalHeader toggle={this.toggleDeleteTagForm}>Delete Tag:</ModalHeader>
+                        <ModalBody>
+                            <DeleteTagForm reloadHandler={this.reload} />
+                        </ModalBody>
+                    </Modal>
+                </div>
             </div>
         );
     }

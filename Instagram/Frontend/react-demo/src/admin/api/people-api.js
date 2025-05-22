@@ -10,7 +10,7 @@ function getPersons(callback) {
     let request = new Request(HOST.people_api + endpoint.people, {
         method: 'GET',
     });
-    console.log(request.url);
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -19,7 +19,7 @@ function getPersonById(idPerson, callback){
         method: 'GET'
     });
 
-    console.log(request.url);
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -33,7 +33,7 @@ function postPerson(user, callback){
         body: JSON.stringify(user)
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
@@ -48,7 +48,7 @@ function editPerson(user, callback){
         body: JSON.stringify(user)
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
@@ -62,7 +62,7 @@ function deletePerson(idPerson, callback){
         },
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     try {
         RestApiClient.performRequest(request, callback);
@@ -76,7 +76,7 @@ function authenticateUser(username, password, callback){
         method: 'GET',
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
     RestApiClient.performRequest(request, callback);
 }
 

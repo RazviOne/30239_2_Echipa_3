@@ -1,14 +1,14 @@
 import React from 'react';
-import validate from "./validators/person-validators";
+import validate from "./validators/tag-validators";
 import Button from "react-bootstrap/Button";
-import * as API_DEVICELINKS from "../api/reactions-api";
+import * as API_TAGS from "../api/tags-api";
 import APIResponseErrorMessage from "../../commons/errorhandling/api-response-error-message";
 import {Col, Row} from "reactstrap";
 import { FormGroup, Input, Label} from 'reactstrap';
 
 
 
-class DeleteDeviceLinkForm extends React.Component {
+class DeleteTagForm extends React.Component {
 
     constructor(props) {
         super(props);
@@ -25,7 +25,7 @@ class DeleteDeviceLinkForm extends React.Component {
             formControls: {
                 id:{
                     value: '',
-                    placeholder: 'ID of the device link that you want to delete...',
+                    placeholder: 'ID of the tag that you want to delete...',
                     valid: false,
                     touched: false,
                     validationRules: {
@@ -71,12 +71,11 @@ class DeleteDeviceLinkForm extends React.Component {
 
     };
 
-    removeDevice(deviceId) {
-        return API_DEVICELINKS.deleteDeviceLink(deviceId, (result, status, error) => {
+    removeTag(tagId) {
+        return API_TAGS.deleteTag(tagId, (result, status, error) => {
             if (result !== null && (status === 200 || status === 202)) {
-                // console.log("Successfully deleted deviceLink:" +
-                //     "\ndeviceId: " + result.deviceId +
-                //     "\npersonId: " + result.personId);
+                // console.log("Successfully deleted tag:" +
+                //     "\ndeviceId: " + result.name);
                 this.reloadHandler();
             } else {
                 this.setState(({
@@ -88,9 +87,7 @@ class DeleteDeviceLinkForm extends React.Component {
     }
 
     handleSubmit() {
-        // let deviceId = this.state.formControls.id.value;
-        // console.log(deviceId);
-        this.removeDevice(this.state.formControls.id.value);
+        this.removeTag(this.state.formControls.id.value);
     }
 
     render() {
@@ -125,4 +122,4 @@ class DeleteDeviceLinkForm extends React.Component {
     }
 }
 
-export default DeleteDeviceLinkForm;
+export default DeleteTagForm;

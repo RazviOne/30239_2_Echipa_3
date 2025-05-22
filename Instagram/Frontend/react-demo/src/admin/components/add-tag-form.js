@@ -1,14 +1,14 @@
 import React from 'react';
-import validate from "./validators/person-validators";
+import validate from "./validators/tag-validators";
 import Button from "react-bootstrap/Button";
-import * as API_DEVICELINKS from "../api/reactions-api";
+import * as API_TAGS from "../api/tags-api";
 import APIResponseErrorMessage from "../../commons/errorhandling/api-response-error-message";
 import {Col, Row} from "reactstrap";
 import { FormGroup, Input, Label} from 'reactstrap';
 
 
 
-class AddDeviceLinkForm extends React.Component {
+class AddTagForm extends React.Component {
 
     constructor(props) {
         super(props);
@@ -23,23 +23,13 @@ class AddDeviceLinkForm extends React.Component {
             formIsValid: false,
 
             formControls: {
-                deviceId:{
+                name:{
                     value: '',
-                    placeholder: 'The ID for the device you want to register...',
+                    placeholder: 'The name of the tag...',
                     valid: false,
                     touched: false,
                     validationRules: {
-                        minLength: 1,
-                        isRequired: true
-                    }
-                },
-                personId: {
-                    value: '',
-                    placeholder: 'The ID for the person you want to register the device for...',
-                    valid: false,
-                    touched: false,
-                    validationRules: {
-                        minLength: 1,
+                        minLength: 2,
                         isRequired: true
                     }
                 }
@@ -81,8 +71,8 @@ class AddDeviceLinkForm extends React.Component {
 
     };
 
-    registerDeviceLink(deviceLink) {
-        return API_DEVICELINKS.postDeviceLink(deviceLink, (result, status, error) => {
+    registerTag(tag) {
+        return API_TAGS.postTag(tag, (result, status, error) => {
             if (result !== null && (status === 200 || status === 201)) {
                 // console.log("Successfully inserted deviceLink with id: " + result);
                 this.reloadHandler();
@@ -96,43 +86,28 @@ class AddDeviceLinkForm extends React.Component {
     }
 
     handleSubmit() {
-        let deviceLink = {
-            deviceId: this.state.formControls.deviceId.value,
-            personId: this.state.formControls.personId.value,
+        let tag = {
+            name: this.state.formControls.name.value
         };
 
-        // console.log(deviceLink);
-        this.registerDeviceLink(deviceLink);
+        this.registerTag(tag);
     }
 
     render() {
         return (
             <div>
 
-                <FormGroup id='deviceId'>
-                    <Label for='deviceIdField'> Device ID: </Label>
-                    <Input name='deviceId' id='deviceIdField' placeholder={this.state.formControls.deviceId.placeholder}
-                           min={0} type="number"
+                <FormGroup id='name'>
+                    <Label for='nameField'> Name: </Label>
+                    <Input name='name' id='nameField' placeholder={this.state.formControls.name.placeholder}
                            onChange={this.handleChange}
-                           defaultValue={this.state.formControls.deviceId.value}
-                           touched={this.state.formControls.deviceId.touched? 1 : 0}
-                           valid={this.state.formControls.deviceId.valid}
+                           defaultValue={this.state.formControls.name.value}
+                           touched={this.state.formControls.name.touched? 1 : 0}
+                           valid={this.state.formControls.name.valid}
                            required
                     />
-                    {this.state.formControls.deviceId.touched && !this.state.formControls.deviceId.valid &&
-                        <div className={"error-message row"}> * Device ID must have at least 1 characters </div>}
-                </FormGroup>
-
-                <FormGroup id='personId'>
-                    <Label for='personIdField'> Person ID: </Label>
-                    <Input name='personId' id='personIdField' placeholder={this.state.formControls.personId.placeholder}
-                           min={0} type="number"
-                           onChange={this.handleChange}
-                           defaultValue={this.state.formControls.personId.value}
-                           touched={this.state.formControls.personId.touched? 1 : 0}
-                           valid={this.state.formControls.personId.valid}
-                           required
-                    />
+                    {this.state.formControls.name.touched && !this.state.formControls.name.valid &&
+                        <div className={"error-message row"}> * Name must start with '#' and have at least 2 characters </div>}
                 </FormGroup>
 
                 <Row>
@@ -150,4 +125,4 @@ class AddDeviceLinkForm extends React.Component {
     }
 }
 
-export default AddDeviceLinkForm;
+export default AddTagForm;

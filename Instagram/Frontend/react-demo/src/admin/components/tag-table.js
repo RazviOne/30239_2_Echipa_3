@@ -4,34 +4,34 @@ import Table from "../../commons/tables/table";
 
 const columns = [
     {
-        Header: 'Device ID',
-        accessor: 'deviceId',
+        Header: 'ID',
+        accessor: 'idTag',
     },
     {
-        Header: 'Person ID',
-        accessor: 'personId',
+        Header: 'Name',
+        accessor: 'name',
     }
 ];
 
 const filters = [
     {
-        accessor: 'deviceId',
+        accessor: 'idTag',
     }
 ];
 
-class DeviceLinkTable extends React.Component {
+class TagTable extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            deviceLinkTableData: this.props.deviceLinkTableData
+            tagTableData: this.props.tagTableData
         };
     }
 
     render() {
         return (
             <Table
-                data={this.state.deviceLinkTableData}
+                data={this.state.tagTableData}
                 columns={columns}
                 search={filters}
                 pageSize={10}
@@ -40,4 +40,4 @@ class DeviceLinkTable extends React.Component {
     }
 }
 
-export default DeviceLinkTable;
+export default TagTable;

@@ -94,7 +94,7 @@ class Table extends Component {
                             getTrProps={this.getTRPropsType}
                             showPagination={true}
                             style={{
-                                height: '300px'
+                                height: '300px',
                             }}
                         />
                     </Col>

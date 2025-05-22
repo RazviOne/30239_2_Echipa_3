@@ -77,7 +77,7 @@ function PostDetails() {
                 alt="Post"
                 style={{
                   width: '100%',
-                  maxHeight: '500px',
+                  maxHeight: '100%',
                   objectFit: 'cover',
                   borderRadius: '8px',
                   marginBottom: '1rem'

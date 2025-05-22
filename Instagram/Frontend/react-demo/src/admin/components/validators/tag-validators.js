@@ -24,6 +24,12 @@ const validate = (value, rules) => {
 
     }
 
+    let firstCharacter = value.toString().substring(0, 1);
+    // console.log(firstCharacter);
+    if(firstCharacter !== '#'){
+        isValid = false;
+    }
+
     return isValid;
 };
 
