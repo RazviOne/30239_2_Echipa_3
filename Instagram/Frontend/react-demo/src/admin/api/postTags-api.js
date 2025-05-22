@@ -23,6 +23,15 @@ function getPostTagById(idPostTag, callback){
     RestApiClient.performRequest(request, callback);
 }
 
+function getPostTagByPostId(idPost, callback){
+    let request = new Request(HOST.posts_api + endpoint.postTags + "/post/" + idPost, {
+        method: 'GET'
+    });
+
+    console.log(request.url);
+    RestApiClient.performRequest(request, callback);
+}
+
 function postPostTag(postTag, callback){
     let request = new Request(HOST.posts_api + endpoint.postTags , {
         method: 'POST',
@@ -74,6 +83,7 @@ function deletePostTag(idPostTag, callback){
 export {
     getPostTags,
     getPostTagById,
+    getPostTagByPostId,
     postPostTag,
     deletePostTag,
     editPostTag

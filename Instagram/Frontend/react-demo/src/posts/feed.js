@@ -55,7 +55,7 @@ function Feed() {
 
     const compareDates = (a, b) => {
         // console.log('Pentru a');
-        console.log(a);
+        // console.log(a);
         let yearA = parseInt(a.substring(0, 4));
         let monthA = parseInt(a.substring(5, 7));
         let dayA = parseInt(a.substring(8, 10));
@@ -73,7 +73,7 @@ function Feed() {
         // console.log(dateA);
 
         // console.log('Pentru b');
-        console.log(b);
+        // console.log(b);
         let yearB = parseInt(b.substring(0, 4));
         let monthB = parseInt(b.substring(5, 7));
         let dayB = parseInt(b.substring(8, 10));
@@ -91,11 +91,11 @@ function Feed() {
         // console.log(dateB);
 
         if(dateA >= dateB){
-            console.log('A e mai recent decat B');
+            // console.log('A e mai recent decat B');
             return -1;
         }
         else{
-            console.log('B e mai recent decat A');
+            // console.log('B e mai recent decat A');
             return 1;
         }
     };

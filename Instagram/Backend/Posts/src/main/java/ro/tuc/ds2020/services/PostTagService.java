@@ -7,9 +7,12 @@ import org.springframework.stereotype.Service;
 import ro.tuc.ds2020.controllers.handlers.exceptions.model.ResourceNotFoundException;
 import ro.tuc.ds2020.dtos.PostTagDTO;
 import ro.tuc.ds2020.dtos.builders.PostTagBuilder;
+import ro.tuc.ds2020.entities.Post;
 import ro.tuc.ds2020.entities.PostTag;
+import ro.tuc.ds2020.repositories.PostRepository;
 import ro.tuc.ds2020.repositories.PostTagRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,10 +22,12 @@ public class PostTagService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostTagService.class);
     private final PostTagRepository postTagRepository;
+    private final PostRepository postRepository;
 
     @Autowired
-    public PostTagService(PostTagRepository postTagRepository) {
+    public PostTagService(PostTagRepository postTagRepository, PostRepository postRepository) {
         this.postTagRepository = postTagRepository;
+        this.postRepository = postRepository;
     }
 
     public List<PostTagDTO> findPostTags() {
@@ -40,6 +45,19 @@ public class PostTagService {
             throw new ResourceNotFoundException(PostTag.class.getSimpleName() + " with id: " + idPostTag);
         }
         return PostTagBuilder.toPostTagDTO(prosumerOptional.get());
+    }
+
+    public List<PostTagDTO> findPostTagByPostId(Integer idPost) {
+        List<PostTagDTO> postTagDTOList = findPostTags();
+        List<PostTagDTO> result = new ArrayList<>();
+
+        for(PostTagDTO postTagDTO : postTagDTOList) {
+            if(postTagDTO.getIdPost().equals(idPost)) {
+                result.add(postTagDTO);
+            }
+        }
+
+        return result;
     }
 
     public Integer insert(PostTagDTO postTagDTO) {

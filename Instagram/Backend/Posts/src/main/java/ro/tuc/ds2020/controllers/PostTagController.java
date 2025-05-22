@@ -9,6 +9,7 @@ import ro.tuc.ds2020.dtos.PostTagDTO;
 import ro.tuc.ds2020.services.PostTagService;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -49,6 +50,17 @@ public class PostTagController {
         failedDto.setIdPostTag(-1);
         try {
             PostTagDTO dto = postTagService.findPostTagById(idPostTag);
+            return new ResponseEntity<>(dto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(failedDto, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/post/{id}")
+    public ResponseEntity<List<PostTagDTO>> getPostTagByPostId(@PathVariable("id") Integer idPost) {
+        List<PostTagDTO> failedDto = new ArrayList<>();
+        try {
+            List<PostTagDTO> dto = postTagService.findPostTagByPostId(idPost);
             return new ResponseEntity<>(dto, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(failedDto, HttpStatus.NOT_FOUND);

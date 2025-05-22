@@ -257,7 +257,7 @@ class AdminContainer extends React.Component {
                         <br />
                         <Row>
                             <div style={{width: '1rem'}}/>
-                            <Col sm={{ size: '10' }}>
+                            <Col sm={{ size: '5' }}>
                                 {this.state.tagTableIsLoaded && <TagTable tagTableData={this.state.tagTableData} />}
                                 {this.state.errorStatus > 0 && (
                                     <APIResponseErrorMessage

@@ -34,7 +34,7 @@ class TagTable extends React.Component {
                 data={this.state.tagTableData}
                 columns={columns}
                 search={filters}
-                pageSize={10}
+                pageSize={5}
             />
         )
     }

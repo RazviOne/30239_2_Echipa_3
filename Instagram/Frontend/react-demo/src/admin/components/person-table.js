@@ -92,7 +92,7 @@ class PersonTable extends React.Component {
                 data={this.state.personTableData}
                 columns={columns}
                 search={filters}
-                pageSize={10}
+                pageSize={5}
             />
         )
     }
