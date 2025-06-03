@@ -10,7 +10,7 @@ function getTags(callback) {
     let request = new Request(HOST.posts_api + endpoint.tags, {
         method: 'GET',
     });
-    console.log(request.url);
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -19,7 +19,16 @@ function getTagById(idTag, callback){
         method: 'GET'
     });
 
-    console.log(request.url);
+    // console.log(request.url);
+    RestApiClient.performRequest(request, callback);
+}
+
+function getTagByName(tagName, callback){
+    let request = new Request(HOST.posts_api + endpoint.tags + "/name/" + tagName, {
+        method: 'GET'
+    });
+
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -33,7 +42,7 @@ function postTag(tag, callback){
         body: JSON.stringify(tag)
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
@@ -48,7 +57,7 @@ function editTag(tag, callback){
         body: JSON.stringify(tag)
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
@@ -62,7 +71,7 @@ function deleteTag(idTag, callback){
         },
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     try {
         RestApiClient.performRequest(request, callback);
@@ -74,6 +83,7 @@ function deleteTag(idTag, callback){
 export {
     getTags,
     getTagById,
+    getTagByName,
     postTag,
     deleteTag,
     editTag

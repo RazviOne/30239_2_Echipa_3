@@ -78,11 +78,21 @@ class Login extends React.Component {
             if (result !== null && (status === 200 || status === 202)) {
                 // alert('Authentication successful');
 
-                // const userData = {
-                //     username: username,
-                //     isAdmin: result.isAdmin
-                // };
-                // login(userData);
+                const userData = {
+                    idPerson: result.idPerson,
+                    name: result.name,
+                    username: result.name,
+                    userScore: result.userScore,
+                    isAdmin: result.isAdmin,
+                    isBanned: result.isBanned,
+                    email: result.email,
+                    phoneNumber: result.phoneNumber,
+                    birthDate: result.birthDate,
+                    homeCity: result.homeCity
+                };
+
+                login(userData);
+
                 this.props.history.push('/home');
             } else {
                 // alert('Authentication failed');

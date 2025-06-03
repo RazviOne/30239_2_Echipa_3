@@ -10,7 +10,7 @@ function getPostTags(callback) {
     let request = new Request(HOST.posts_api + endpoint.postTags, {
         method: 'GET',
     });
-    console.log(request.url);
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -19,7 +19,7 @@ function getPostTagById(idPostTag, callback){
         method: 'GET'
     });
 
-    console.log(request.url);
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -28,7 +28,7 @@ function getPostTagByPostId(idPost, callback){
         method: 'GET'
     });
 
-    console.log(request.url);
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -42,7 +42,7 @@ function postPostTag(postTag, callback){
         body: JSON.stringify(postTag)
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
@@ -57,7 +57,7 @@ function editPostTag(postTag, callback){
         body: JSON.stringify(postTag)
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
@@ -71,7 +71,7 @@ function deletePostTag(idPostTag, callback){
         },
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     try {
         RestApiClient.performRequest(request, callback);

@@ -42,6 +42,17 @@ public class TagService {
         return TagBuilder.toTagDTO(prosumerOptional.get());
     }
 
+    public TagDTO findTagByName(String name) {
+        List<TagDTO> tags = findTags();
+        for (TagDTO tag : tags) {
+            if (tag.getName().equals(name)) {
+                return tag;
+            }
+        }
+
+        throw new ResourceNotFoundException(Tag.class.getSimpleName() + " with name: " + name);
+    }
+
     public Integer insert(TagDTO tagDTO) {
         Tag tag = TagBuilder.toEntity(tagDTO);
         tag = tagRepository.save(tag);

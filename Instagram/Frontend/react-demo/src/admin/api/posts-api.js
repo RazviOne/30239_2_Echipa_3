@@ -10,7 +10,7 @@ function getPosts(callback) {
     let request = new Request(HOST.posts_api + endpoint.posts, {
         method: 'GET',
     });
-    console.log(request.url);
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -19,7 +19,7 @@ function getPostById(idPost, callback){
         method: 'GET'
     });
 
-    console.log(request.url);
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -33,7 +33,7 @@ function postPost(post, callback){
         body: JSON.stringify(post)
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
@@ -48,7 +48,7 @@ function editPost(post, callback){
         body: JSON.stringify(post)
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
@@ -62,7 +62,7 @@ function deletePost(idPost, callback){
         },
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     try {
         RestApiClient.performRequest(request, callback);

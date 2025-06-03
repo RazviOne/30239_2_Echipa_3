@@ -59,6 +59,18 @@ public class TagController {
         }
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<TagDTO> getTagByName(@PathVariable("name") String name) {
+        TagDTO failedDto = new TagDTO();
+        failedDto.setIdTag(-1);
+        try {
+            TagDTO dto = tagService.findTagByName("#" + name);
+            return new ResponseEntity<>(dto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(failedDto, HttpStatus.OK);
+        }
+    }
+
     @PostMapping("/{id}")
     public ResponseEntity<TagDTO> updateTag(@Valid @RequestBody TagDTO tagDTO,
                                             @PathVariable("id") Integer idTag) {

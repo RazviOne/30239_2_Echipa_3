@@ -31,10 +31,10 @@ function PostDetails() {
 
               fetchTags(id).then((tags) => {
                   if(tags.length === 0){
-                      console.log('N-avem tag-uri');
+                      // console.log('N-avem tag-uri');
                   }
                   else {
-                      console.log('Avem tag-uri');
+                      // console.log('Avem tag-uri');
                       setPostTags(tags);
                   }
               });
@@ -105,7 +105,7 @@ function PostDetails() {
                 }}>
                 <div>{username}</div>
                 <div style={{ fontSize: '0.9rem', color: 'gray' }}>
-                    {timeAgo(post.dateCreated)} • {post.status || 'fără status'}
+                    {new Date(post.dateCreated).toLocaleString()} • {post.status || 'fără status'}
                 </div>
             </div>
 

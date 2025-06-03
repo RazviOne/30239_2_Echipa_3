@@ -2,42 +2,105 @@ import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import * as API_POSTS from '../admin/api/posts-api';
 import * as API_USERS from '../admin/api/people-api';
-import { Card, CardBody, CardTitle, CardText } from 'reactstrap';
+import {
+    Card,
+    CardBody,
+    CardTitle,
+    CardText,
+    Button,
+    ModalHeader,
+    ModalBody,
+    Modal,
+    Dropdown,
+    DropdownToggle, DropdownMenu, DropdownItem, Row, Col
+} from 'reactstrap';
 import LogoImg from '../commons/images/Instagram_login_Logo.png';
 import UserImg from '../commons/images/user.png';
 import NavigationBar from "../navigation-bar";
+import RegisterPersonForm from "../login/components/register-person-form";
+import NewPostForm from "./components/new-post-form";
 
-function Feed() {
-    const [posts, setPosts] = useState([]);
-    const { user } = useContext(UserContext);
-    const [usernames, setUsernames] = useState({});
+class Feed extends React.Component {
 
-    useEffect(() => {
-        API_POSTS.getPosts((result, status, error) => {
+    static contextType = UserContext;
+
+    constructor(props) {
+        super(props);
+
+        this.toggleNewPostForm = this.toggleNewPostForm.bind(this);
+        this.toggleUsernamesDropdown = this.toggleUsernamesDropdown.bind(this);
+        this.handleNewPost = this.handleNewPost.bind(this);
+        this.reload = this.reload.bind(this);
+
+        this.state = {
+            posts: [],
+            usernames: [],
+            showNewPostForm: false,
+            usernamesDropdownIsOpen: false,
+            postFilterPersonId: 0,
+            username: '',
+            password: '',
+            errorMessage: '',
+            errorStatus: 0
+        };
+
+        this.showPostsFromUser = this.showPostsFromUser.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+    }
+
+    componentDidMount() {
+        // this.protectRoute();
+        this.fetchPosts();
+        this.fetchUsernames();
+    }
+
+    handleInputChange(event) {
+        const { name, value } = event.target;
+        this.setState({ [name]: value, errorMessage: '' });
+    }
+
+    toggleNewPostForm() {
+        this.setState({ showNewPostForm: !this.state.showNewPostForm });
+    }
+
+    toggleUsernamesDropdown(){
+        this.setState({ usernamesDropdownIsOpen: !this.state.usernamesDropdownIsOpen });
+    }
+
+    showPostsFromUser(e){
+        // console.log(e.target.value);
+        this.setState({ postFilterPersonId: parseInt(e.target.value) });
+        this.reload();
+    }
+
+    fetchPosts(){
+        API_POSTS.getPosts(async(result, status, error) => {
             if (result !== null && status === 200) {
-                setPosts(result);
-
-                result.forEach(post => {
-                    const id = post.idPerson;
-
-                    if (!usernames[id]) {
-                        API_USERS.getPersonById(id, (userData, userStatus) => {
-                            if (userData !== null && userStatus === 200) {
-                                setUsernames(prev => ({
-                                    ...prev,
-                                    [id]: userData.username
-                                }));
-                            }
-                        });
-                    }
-                });
+                this.setState({
+                    posts: result
+                })
             } else {
                 console.error("Eroare la obținerea postărilor:", error);
             }
         });
-    }, []);
+    }
 
-    const timeAgo = (dateString) => {
+    fetchUsernames(){
+        API_USERS.getPersons((result, status, error) => {
+            if(result !== null && (status === 200 || status === 201)){
+                // console.log(result);
+                result.map(username => {
+                    this.setState((prevState) => ({
+                        usernames: [...prevState.usernames,
+                            {id: username.idPerson, username: username.username}
+                        ]
+                    }));
+                })
+            }
+        });
+    }
+
+    timeAgo(dateString){
         const postDate = new Date(dateString);
         const now = new Date();
         const diffMs = now - postDate;
@@ -51,127 +114,154 @@ function Feed() {
         if (diffHours < 24) return `${diffHours}h ago`;
         if (diffDays < 7) return `${diffDays}d ago`;
         return postDate.toLocaleDateString('ro-RO'); // dacă e mai vechi de o săptămână, afișăm data
-    };
+    }
 
-    const compareDates = (a, b) => {
-        // console.log('Pentru a');
-        // console.log(a);
-        let yearA = parseInt(a.substring(0, 4));
-        let monthA = parseInt(a.substring(5, 7));
-        let dayA = parseInt(a.substring(8, 10));
-        let hourA = parseInt(a.substring(11, 13));
-        let minuteA = parseInt(a.substring(14, 16));
-        let secondA = parseInt(a.substring(17, 19));
-        // console.log(`Year: ${yearA}\nMonth: ${monthA}\nDay: ${dayA}\nHour: ${hourA}\nMinute: ${minuteA}\nSecond: ${secondA}\n`);
-        let dateA = new Date();
-        dateA.setFullYear(yearA);
-        dateA.setMonth(monthA - 1);
-        dateA.setDate(dayA);
-        dateA.setHours(hourA);
-        dateA.setMinutes(minuteA);
-        dateA.setSeconds(secondA);
-        // console.log(dateA);
+    handleNewPost(){
+        this.reload();
+    }
 
-        // console.log('Pentru b');
-        // console.log(b);
-        let yearB = parseInt(b.substring(0, 4));
-        let monthB = parseInt(b.substring(5, 7));
-        let dayB = parseInt(b.substring(8, 10));
-        let hourB = parseInt(b.substring(11, 13));
-        let minuteB = parseInt(b.substring(14, 16));
-        let secondB = parseInt(b.substring(17, 19));
-        let dateB = new Date();
-        dateB.setFullYear(yearB);
-        dateB.setMonth(monthB - 1);
-        dateA.setDate(dayB);
-        dateB.setHours(hourB);
-        dateB.setMinutes(minuteB);
-        dateB.setSeconds(secondB);
-        // console.log(`Year: ${yearB}\nMonth: ${monthB}\nDay: ${dayB}\nHour: ${hourB}\nMinute: ${minuteB}\nSecond: ${secondB}\n`);
-        // console.log(dateB);
+    async reload(){
+        this.setState({
+            posts: [],
+            usernames: [],
+            showNewPostForm: false,
+            username: '',
+            password: '',
+        });
 
-        if(dateA >= dateB){
-            // console.log('A e mai recent decat B');
-            return -1;
-        }
-        else{
-            // console.log('B e mai recent decat A');
-            return 1;
-        }
-    };
+        await this.fetchPosts();
+        await this.fetchUsernames();
+    }
 
+    render(){
     return (
-  <>
-    <NavigationBar />
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '1rem 10%',
-        backgroundColor: '#fafafa',
-        minHeight: '100vh'
-      }}
-    >
-        {/* FEED */}
-            {posts.length === 0 && <p>Nu există postări momentan.</p>}
+            <div>
+                <NavigationBar/>
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        padding: '1rem 10%',
+                        backgroundColor: '#fafafa',
+                        minHeight: '100vh'
+                    }}
+                >
+                    {/* FEED */}
+                    <Row>
+                        <Col>
+                            <Button
+                                color="success"
+                                onClick={() => this.toggleNewPostForm()}
+                            >
+                                New Post
+                            </Button>
+                        </Col>
+                        <Col>
+                            <Dropdown
+                                isOpen={this.state.usernamesDropdownIsOpen}
+                                toggle={this.toggleUsernamesDropdown}
+                                direction="down"
+                            >
+                                <DropdownToggle color="primary" caret>Username</DropdownToggle>
+                                <DropdownMenu>
+                                    <DropdownItem key="0" value="0" onClick={this.showPostsFromUser}>All Users</DropdownItem>
+                                    {Object.values(this.state.usernames)
+                                        .sort((a, b) => a.username.localeCompare(b.username)) // Alphabetical sort
+                                        .map((obj) => (
+                                            <DropdownItem key={obj.id} value={obj.id} onClick={this.showPostsFromUser}>{obj.username}</DropdownItem>
+                                        ))}
+                                </DropdownMenu>
+                            </Dropdown>
+                        </Col>
+                    </Row>
 
-            {posts
-                .sort((a, b) => compareDates(a.dateCreated, b.dateCreated))
-                .map((post, idx) => {
-                let imageSource = "";
-                if( post.image !== undefined &&
-                    post.image !== null) {
-                    imageSource = "data:image/png;base64, " + post.image;
-                }
+                    <Modal
+                        isOpen={this.state.showNewPostForm}
+                        toggle={this.toggleNewPostForm}
+                        className={this.props.className}
+                        size="lg"
+                    >
+                        <ModalHeader toggle={this.toggleNewPostForm}>Create Post:</ModalHeader>
+                        <ModalBody>
+                            <NewPostForm reloadHandler={this.handleNewPost} />
+                        </ModalBody>
+                    </Modal>
 
-                return (
-                        <Card
-                            key={idx}
-                            onClick={() => window.location.href = `/post/${post.idPost}`}
-                            style={{
-                                marginBottom: '2rem',
-                                padding: '1rem',
-                                maxWidth: '45rem',
-                                cursor: 'pointer',
-                                transition: '0.3s',
-                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
-                            }}
-                        >
-                            <CardBody style={{marginLeft: 'auto', marginRight: 'auto'}}>
-                                <div style={{fontWeight: 'bold', marginBottom: '0.5rem'}}>
-                                    {usernames[post.idPerson]}<span style={{ color: 'gray', fontSize: '0.9rem' }}> • {timeAgo(post.dateCreated)}</span>
-                                </div>
+                    <div style={{height: "1rem"}}/>
 
-                                {imageSource && (
-                                    <img
-                                        src={imageSource}
-                                        alt="Post"
-                                        style={{
-                                            maxHeight: '40rem',
-                                            maxWidth: '100%',
-                                            objectFit: 'cover',
-                                            borderRadius: '8px',
-                                            marginBottom: '1rem'
-                                        }}
-                                    />
-                                )}
+                    {this.state.posts.length === 0 && <p>Nu există postări momentan.</p>}
 
-                                
+                    {this.state.posts
+                        .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated))
+                        .filter(post => {
+                            if(this.state.postFilterPersonId === 0){
+                                return true;
+                            }
 
+                            if(post.idPerson === this.state.postFilterPersonId){
+                                return true;
+                            }
 
-                                <CardTitle tag="h5" style={{marginBottom: '0.5rem'}}>
-                                    {post.title}
-                                </CardTitle>
-                                <CardText>{post.text}</CardText>
-                            </CardBody>
-                        </Card>
-                    )
-                })}
-    </div>
-  </>
-);
+                            return false;
+                        })
+                        .map((post, idx) => {
+                            let imageSource = "";
+                            if (post.image !== undefined &&
+                                post.image !== null) {
+                                imageSource = "data:image/png;base64, " + post.image;
+                            }
 
+                            return (
+                                <Card
+                                    key={idx}
+                                    onClick={() => window.location.href = `/post/${post.idPost}`}
+                                    style={{
+                                        marginBottom: '2rem',
+                                        padding: '1rem',
+                                        maxWidth: '45rem',
+                                        cursor: 'pointer',
+                                        transition: '0.3s',
+                                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
+                                    }}
+                                >
+                                    <CardBody style={{marginLeft: 'auto', marginRight: 'auto'}}>
+                                        <div style={{fontWeight: 'bold', marginBottom: '0.5rem'}}>
+                                            {this.state.usernames.find(username => username.id === post.idPerson).username}
+                                            <span style={{
+                                            color: 'gray',
+                                            fontSize: '0.9rem'
+                                            }}>
+                                                • {this.timeAgo(post.dateCreated)}
+                                            </span>
+                                        </div>
+
+                                        {imageSource && (
+                                            <img
+                                                src={imageSource}
+                                                alt="Post"
+                                                style={{
+                                                    maxHeight: '40rem',
+                                                    maxWidth: '100%',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '8px',
+                                                    marginBottom: '1rem'
+                                                }}
+                                            />
+                                        )}
+
+                                        <CardTitle tag="h5" style={{marginBottom: '0.5rem'}}>
+                                            {post.title}
+                                        </CardTitle>
+                                        <CardText>{post.text}</CardText>
+                                    </CardBody>
+                                </Card>
+                            )
+                        })}
+                </div>
+            </div>
+        )
+    };
 }
 
 export default Feed;

@@ -10,7 +10,7 @@ function getReactions (callback) {
     let request = new Request(HOST.reactions_api + endpoint.reactions, {
         method: 'GET',
     });
-    console.log(request.url);
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -19,7 +19,7 @@ function getReactionById(idReaction, callback){
         method: 'GET'
     });
 
-    console.log(request.url);
+    // console.log(request.url);
     RestApiClient.performRequest(request, callback);
 }
 
@@ -33,7 +33,7 @@ function postReaction(reaction, callback){
         body: JSON.stringify(reaction)
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     RestApiClient.performRequest(request, callback);
 }
@@ -47,7 +47,7 @@ function deleteReaction(idReaction, callback){
         },
     });
 
-    console.log("URL: " + request.url);
+    // console.log("URL: " + request.url);
 
     try {
         RestApiClient.performRequest(request, callback);
