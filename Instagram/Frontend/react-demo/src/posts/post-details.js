@@ -154,9 +154,14 @@ class PostDetails extends React.Component {
 
     handleLike = () => {
   const { user } = this.context;
-  const { postId } = this.state;
+  const { postId, post } = this.state;
 
-  if (!user || !user.idPerson) return;
+  if (!user || !user.idPerson || !post) return;
+
+  if (user.idPerson === post.idPerson) {
+    alert("You can't vote on your own post.");
+    return;
+  }
 
   API_REACTIONS.getReactions((allReactions, status) => {
     if (status === 200 && Array.isArray(allReactions)) {
@@ -166,6 +171,7 @@ class PostDetails extends React.Component {
 
       if (existing && existing.isLiked === true) {
         API_REACTIONS.deleteReaction(existing.idReaction, () => {
+        //   alert("Like removed.");
           this.fetchPost();
         });
       } else if (existing) {
@@ -175,6 +181,7 @@ class PostDetails extends React.Component {
           isLiked: true,
         };
         API_REACTIONS.updateReaction(existing.idReaction, payload, () => {
+          alert("Reaction changed to Like.");
           this.fetchPost();
         });
       } else {
@@ -184,6 +191,7 @@ class PostDetails extends React.Component {
           isLiked: true,
         };
         API_REACTIONS.postReaction(payload, () => {
+        //   alert("Liked.");
           this.fetchPost();
         });
       }
@@ -191,11 +199,17 @@ class PostDetails extends React.Component {
   });
 };
 
+
 handleDislike = () => {
   const { user } = this.context;
-  const { postId } = this.state;
+  const { postId, post } = this.state;
 
-  if (!user || !user.idPerson) return;
+  if (!user || !user.idPerson || !post) return;
+
+  if (user.idPerson === post.idPerson) {
+    alert("You can't vote on your own post.");
+    return;
+  }
 
   API_REACTIONS.getReactions((allReactions, status) => {
     if (status === 200 && Array.isArray(allReactions)) {
@@ -205,6 +219,7 @@ handleDislike = () => {
 
       if (existing && existing.isLiked === false) {
         API_REACTIONS.deleteReaction(existing.idReaction, () => {
+        //   alert("Dislike removed.");
           this.fetchPost();
         });
       } else if (existing) {
@@ -214,6 +229,7 @@ handleDislike = () => {
           isLiked: false,
         };
         API_REACTIONS.updateReaction(existing.idReaction, payload, () => {
+          alert("Reaction changed to Dislike.");
           this.fetchPost();
         });
       } else {
@@ -223,12 +239,14 @@ handleDislike = () => {
           isLiked: false,
         };
         API_REACTIONS.postReaction(payload, () => {
+        //   alert("Disliked.");
           this.fetchPost();
         });
       }
     }
   });
 };
+
 
 
 
