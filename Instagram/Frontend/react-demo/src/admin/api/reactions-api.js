@@ -38,6 +38,22 @@ function postReaction(reaction, callback){
     RestApiClient.performRequest(request, callback);
 }
 
+function updateReaction(idReaction, reaction, callback) {
+    let request = new Request(HOST.reactions_api + endpoint.reactions + "/" + idReaction, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reaction)
+    });
+
+    console.log("URL UPDATE:", request.url);
+
+    RestApiClient.performRequest(request, callback);
+}
+
+
 function deleteReaction(idReaction, callback){
     let request = new Request(HOST.reactions_api + endpoint.reactions + "/" + idReaction, {
         method: 'DELETE',
@@ -61,4 +77,5 @@ export {
     getReactionById,
     postReaction,
     deleteReaction,
+    updateReaction,
 };

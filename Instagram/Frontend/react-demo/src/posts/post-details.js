@@ -8,6 +8,8 @@ import NavigationBar from '../navigation-bar';
 import { UserContext } from '../contexts/UserContext';
 import DeletePostNotification from "./components/delete-post-notification";
 import EditPostForm from "./components/edit-post-form";
+import * as API_REACTIONS from '../admin/api/reactions-api';
+
 
 class PostDetails extends React.Component {
 
@@ -34,17 +36,18 @@ class PostDetails extends React.Component {
     }
 
     async componentDidMount() {
-        // this.protectRoute();
-        let urlLength = window.location.href.length;
-        // console.log(urlLength);
-        let postId = parseInt(window.location.href.toString().substring(urlLength - 2));
-        // console.log(postId);
-        await this.setState({
-            postId: postId
-        })
+        const url = window.location.pathname;
+        const segments = url.split('/');
+        const postId = parseInt(segments[segments.length - 1]);
 
-        this.fetchPost();
+        if (!isNaN(postId)) {
+            await this.setState({ postId });
+            this.fetchPost();
+        } else {
+            console.error('ID post invalid:', postId);
+        }
     }
+
 
     toggleEditPostForm(){
         this.setState({ showEditPostForm: !this.state.showEditPostForm });
@@ -83,33 +86,40 @@ class PostDetails extends React.Component {
     };
 
     fetchPost() {
-        // console.log("Postarea curenta cu id: " + this.state.postId)
-        API_POSTS.getPostById(this.state.postId, (result, status) => {
-            if (result !== null && status === 200) {
-                // console.log(result);
-                this.setState({
-                    post: result,
-                    imageSource: "data:image/png;base64, " + result.image
-                });
-
-                API_USERS.getPersonById(result.idPerson, (res, stat) => {
-                    if (res !== null && stat === 200) {
-                        this.setState({
-                            username: res.username
-                        });
-                    }
-                });
-
-                this.fetchTags(this.state.postId).then((tags) => {
-                    if (tags.length !== 0) {
-                        this.setState({
-                           postTags: tags
-                        });
-                    }
-                });
-            }
-        });
+    if (!this.state.postId) {
+        console.error('Post ID invalid.');
+        return;
     }
+
+    API_POSTS.getPostById(this.state.postId, (result, status) => {
+        if (result !== null && status === 200) {
+            this.setState({
+                post: result,
+                imageSource: "data:image/png;base64, " + result.image
+            }, () => {
+                // apelăm updateVotesCount după ce post-ul a fost setat
+                this.updateVotesCount();
+            });
+
+            API_USERS.getPersonById(result.idPerson, (res, stat) => {
+                if (res !== null && stat === 200) {
+                    this.setState({
+                        username: res.username
+                    });
+                }
+            });
+
+            this.fetchTags(this.state.postId).then((tags) => {
+                if (tags.length !== 0) {
+                    this.setState({
+                        postTags: tags
+                    });
+                }
+            });
+        }
+    });
+}
+
 
     deletePost(){
         API_POSTS.deletePost(this.state.postId, () => {});
@@ -121,6 +131,110 @@ class PostDetails extends React.Component {
              deleteNotification: true
          });
     }
+
+    
+
+    updateVotesCount() {
+    const { postId } = this.state;
+
+    API_REACTIONS.getReactions((allReactions, status) => {
+        if (status === 200 && Array.isArray(allReactions)) {
+        const relevant = allReactions.filter(r => r.idPost === postId);
+        const totalVotes = relevant.reduce((acc, r) => acc + (r.isLiked ? 1 : -1), 0);
+        
+        this.setState(prev => ({
+            post: {
+            ...prev.post,
+            totalVotes: totalVotes
+            }
+        }));
+        }
+    });
+}
+
+    handleLike = () => {
+  const { user } = this.context;
+  const { postId } = this.state;
+
+  if (!user || !user.idPerson) return;
+
+  API_REACTIONS.getReactions((allReactions, status) => {
+    if (status === 200 && Array.isArray(allReactions)) {
+      const existing = allReactions.find(
+        r => r.idPerson === user.idPerson && r.idPost === postId
+      );
+
+      if (existing && existing.isLiked === true) {
+        API_REACTIONS.deleteReaction(existing.idReaction, () => {
+          this.fetchPost();
+        });
+      } else if (existing) {
+        const payload = {
+          idPerson: user.idPerson,
+          idPost: postId,
+          isLiked: true,
+        };
+        API_REACTIONS.updateReaction(existing.idReaction, payload, () => {
+          this.fetchPost();
+        });
+      } else {
+        const payload = {
+          idPerson: user.idPerson,
+          idPost: postId,
+          isLiked: true,
+        };
+        API_REACTIONS.postReaction(payload, () => {
+          this.fetchPost();
+        });
+      }
+    }
+  });
+};
+
+handleDislike = () => {
+  const { user } = this.context;
+  const { postId } = this.state;
+
+  if (!user || !user.idPerson) return;
+
+  API_REACTIONS.getReactions((allReactions, status) => {
+    if (status === 200 && Array.isArray(allReactions)) {
+      const existing = allReactions.find(
+        r => r.idPerson === user.idPerson && r.idPost === postId
+      );
+
+      if (existing && existing.isLiked === false) {
+        API_REACTIONS.deleteReaction(existing.idReaction, () => {
+          this.fetchPost();
+        });
+      } else if (existing) {
+        const payload = {
+          idPerson: user.idPerson,
+          idPost: postId,
+          isLiked: false,
+        };
+        API_REACTIONS.updateReaction(existing.idReaction, payload, () => {
+          this.fetchPost();
+        });
+      } else {
+        const payload = {
+          idPerson: user.idPerson,
+          idPost: postId,
+          isLiked: false,
+        };
+        API_REACTIONS.postReaction(payload, () => {
+          this.fetchPost();
+        });
+      }
+    }
+  });
+};
+
+
+
+
+
+
 
     // const timeAgo = (dateString) => {
     //   const postDate = new Date(dateString);
@@ -231,8 +345,8 @@ class PostDetails extends React.Component {
                                 <Row>
                                     <Col>
                                         <div style={{display: 'flex', gap: '1rem', marginTop: '1rem'}}>
-                                            <Button color="success" onClick={() => alert('Liked!')}>Like</Button>
-                                            <Button color="danger" onClick={() => alert('Disliked!')}>Dislike</Button>
+                                            <Button color="success" onClick={this.handleLike}>Like</Button>
+                                            <Button color="danger" onClick={this.handleDislike}>Dislike</Button>
                                         </div>
                                     </Col>
                                     <Col>
