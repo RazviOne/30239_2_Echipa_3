@@ -160,7 +160,7 @@ class NewPostForm extends React.Component {
     }
 
     processTags(tagNames, idPost) {
-        tagNames.map(tagName => {
+        tagNames.forEach(tagName => {
             // console.log("Find tag with name: " + tagName);
             API_TAGS.getTagByName(tagName, async(result, status, error) => {
                 if (result.idTag !== -1 && (status === 200 || status === 201)) {
@@ -217,18 +217,6 @@ class NewPostForm extends React.Component {
             dateCreated.getMinutes().toString().padStart(2, "0") +
             ":" +
             dateCreated.getSeconds().toString().padStart(2, "0");
-
-        // const file = this.state.formControls.image.value;
-        // let imageBase64 = null;
-        //
-        // if(file) {
-        //     imageBase64 = await new Promise((resolve, reject) => {
-        //         const reader = new FileReader();
-        //         reader.onloadend = () => resolve(reader.result.split(',')[1]);
-        //         reader.onerror = reject;
-        //         reader.readAsDataURL(file);
-        //     });
-        // }
 
         let post = {
             idPerson: user.idPerson,

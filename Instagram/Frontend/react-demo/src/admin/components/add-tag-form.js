@@ -30,7 +30,8 @@ class AddTagForm extends React.Component {
                     touched: false,
                     validationRules: {
                         minLength: 2,
-                        isRequired: true
+                        isRequired: true,
+                        hashTagRequired: true
                     }
                 }
             }

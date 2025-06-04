@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React from 'react';
 import { UserContext } from '../contexts/UserContext';
 import * as API_POSTS from '../admin/api/posts-api';
 import * as API_USERS from '../admin/api/people-api';
@@ -14,10 +14,10 @@ import {
     Dropdown,
     DropdownToggle, DropdownMenu, DropdownItem, Row, Col
 } from 'reactstrap';
-import LogoImg from '../commons/images/Instagram_login_Logo.png';
-import UserImg from '../commons/images/user.png';
+// import LogoImg from '../commons/images/Instagram_login_Logo.png';
+// import UserImg from '../commons/images/user.png';
 import NavigationBar from "../navigation-bar";
-import RegisterPersonForm from "../login/components/register-person-form";
+// import RegisterPersonForm from "../login/components/register-person-form";
 import NewPostForm from "./components/new-post-form";
 
 class Feed extends React.Component {
@@ -29,7 +29,6 @@ class Feed extends React.Component {
 
         this.toggleNewPostForm = this.toggleNewPostForm.bind(this);
         this.toggleUsernamesDropdown = this.toggleUsernamesDropdown.bind(this);
-        this.handleNewPost = this.handleNewPost.bind(this);
         this.reload = this.reload.bind(this);
 
         this.state = {
@@ -38,8 +37,6 @@ class Feed extends React.Component {
             showNewPostForm: false,
             usernamesDropdownIsOpen: false,
             postFilterPersonId: 0,
-            username: '',
-            password: '',
             errorMessage: '',
             errorStatus: 0
         };
@@ -89,7 +86,7 @@ class Feed extends React.Component {
         API_USERS.getPersons((result, status, error) => {
             if(result !== null && (status === 200 || status === 201)){
                 // console.log(result);
-                result.map(username => {
+                result.forEach(username => {
                     this.setState((prevState) => ({
                         usernames: [...prevState.usernames,
                             {id: username.idPerson, username: username.username}
@@ -116,17 +113,15 @@ class Feed extends React.Component {
         return postDate.toLocaleDateString('ro-RO'); // dacă e mai vechi de o săptămână, afișăm data
     }
 
-    handleNewPost(){
-        this.reload();
-    }
+    // handleNewPost(){
+    //     this.reload();
+    // }
 
     async reload(){
         this.setState({
             posts: [],
             usernames: [],
             showNewPostForm: false,
-            username: '',
-            password: '',
         });
 
         await this.fetchPosts();
@@ -152,7 +147,7 @@ class Feed extends React.Component {
                         <Col>
                             <Button
                                 color="success"
-                                onClick={() => this.toggleNewPostForm()}
+                                onClick={this.toggleNewPostForm}
                             >
                                 New Post
                             </Button>
@@ -184,7 +179,7 @@ class Feed extends React.Component {
                     >
                         <ModalHeader toggle={this.toggleNewPostForm}>Create Post:</ModalHeader>
                         <ModalBody>
-                            <NewPostForm reloadHandler={this.handleNewPost} />
+                            <NewPostForm reloadHandler={this.reload} />
                         </ModalBody>
                     </Modal>
 

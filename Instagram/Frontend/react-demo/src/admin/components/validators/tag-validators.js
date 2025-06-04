@@ -7,6 +7,12 @@ const requiredValidator = value => {
     return value.trim() !== '';
 };
 
+const hashTagValidator = value => {
+    return value.toString().substring(0, 1) === '#';
+
+
+};
+
 const validate = (value, rules) => {
     let isValid = true;
 
@@ -19,15 +25,12 @@ const validate = (value, rules) => {
             case 'isRequired': isValid = isValid && requiredValidator(value);
                 break;
 
+            case 'hashTagRequired': isValid = isValid && hashTagValidator(value);
+                break;
+
             default: isValid = true;
         }
 
-    }
-
-    let firstCharacter = value.toString().substring(0, 1);
-    // console.log(firstCharacter);
-    if(firstCharacter !== '#'){
-        isValid = false;
     }
 
     return isValid;

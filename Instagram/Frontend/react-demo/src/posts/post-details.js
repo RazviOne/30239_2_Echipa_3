@@ -1,48 +1,62 @@
-import React, { useEffect, useState, useContext  } from 'react';
-import { useParams } from 'react-router-dom';
+import React from 'react';
 import * as API_POSTS from '../admin/api/posts-api';
 import * as API_USERS from '../admin/api/people-api';
 import * as API_POSTTAGS from '../admin/api/postTags-api'
 import * as API_TAGS from '../admin/api/tags-api'
-import { Card, CardBody, CardTitle, CardText, Button } from 'reactstrap';
+import {Card, CardBody, CardText, Button, Row, Col, ModalHeader, ModalBody, Modal} from 'reactstrap';
 import NavigationBar from '../navigation-bar';
 import { UserContext } from '../contexts/UserContext';
+import DeletePostNotification from "./components/delete-post-notification";
+import EditPostForm from "./components/edit-post-form";
 
+class PostDetails extends React.Component {
 
+    static contextType = UserContext;
 
-function PostDetails() {
-  const { id } = useParams();  
-  const [post, setPost] = useState(null);
-  const [postTags, setPostTags] = useState([]);
-  const [username, setUsername] = useState('Utilizator necunoscut');
-  const { user } = useContext(UserContext);
+    constructor(props) {
+        super(props);
 
+        this.handlePostDelete = this.handlePostDelete.bind(this);
+        this.dismissDeletePostNotification = this.dismissDeletePostNotification.bind(this);
+        this.deletePost = this.deletePost.bind(this);
+        this.toggleEditPostForm = this.toggleEditPostForm.bind(this);
+        this.reload = this.reload.bind(this);
 
-  useEffect( () => {
-      API_POSTS.getPostById(id, (result, status) => {
-          if (result !== null && status === 200) {
-              setPost(result);
+        this.state = {
+            postId: null,
+            post: null,
+            postTags: [],
+            username: 'Utilizator necunoscut',
+            imageSource: null,
+            deleteNotification: false,
+            showEditPostForm: false
+        }
+    }
 
-              API_USERS.getPersonById(result.idPerson, (res, stat) => {
-                  if (res !== null && stat === 200) {
-                      setUsername(res.username);
-                  }
-              });
+    async componentDidMount() {
+        // this.protectRoute();
+        let urlLength = window.location.href.length;
+        // console.log(urlLength);
+        let postId = parseInt(window.location.href.toString().substring(urlLength - 2));
+        // console.log(postId);
+        await this.setState({
+            postId: postId
+        })
 
-              fetchTags(id).then((tags) => {
-                  if(tags.length === 0){
-                      // console.log('N-avem tag-uri');
-                  }
-                  else {
-                      // console.log('Avem tag-uri');
-                      setPostTags(tags);
-                  }
-              });
-          }
-      });
-  }, [id]);
+        this.fetchPost();
+    }
 
-    const fetchTags = (id) => {
+    toggleEditPostForm(){
+        this.setState({ showEditPostForm: !this.state.showEditPostForm });
+    }
+
+    dismissDeletePostNotification(){
+        this.setState({
+            deleteNotification: false
+        })
+    }
+
+    fetchTags(id) {
         return new Promise((resolve, reject) => {
             API_POSTTAGS.getPostTagByPostId(id, (result, status, error) => {
                 if (status === 200 && result) {
@@ -52,7 +66,7 @@ function PostDetails() {
                                 if (tagStatus === 200 && tagResult) {
                                     resTag(tagResult.name);
                                 } else {
-                                    resTag(null); // continue even if some fail
+                                    resTag(null);
                                 }
                             });
                         })
@@ -62,92 +76,193 @@ function PostDetails() {
                         resolve(names.filter(name => name !== null));
                     });
                 } else {
-                    resolve([]); // resolve with empty array if no tags
+                    resolve([]);
                 }
             });
         });
     };
 
-  const timeAgo = (dateString) => {
-    const postDate = new Date(dateString);
-    const now = new Date();
-    const diffMs = now - postDate;
+    fetchPost() {
+        // console.log("Postarea curenta cu id: " + this.state.postId)
+        API_POSTS.getPostById(this.state.postId, (result, status) => {
+            if (result !== null && status === 200) {
+                // console.log(result);
+                this.setState({
+                    post: result,
+                    imageSource: "data:image/png;base64, " + result.image
+                });
 
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                API_USERS.getPersonById(result.idPerson, (res, stat) => {
+                    if (res !== null && stat === 200) {
+                        this.setState({
+                            username: res.username
+                        });
+                    }
+                });
 
-    if (diffMinutes < 1) return 'chiar acum';
-    if (diffMinutes < 60) return `${diffMinutes}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return postDate.toLocaleDateString('ro-RO');
-  };
+                this.fetchTags(this.state.postId).then((tags) => {
+                    if (tags.length !== 0) {
+                        this.setState({
+                           postTags: tags
+                        });
+                    }
+                });
+            }
+        });
+    }
 
-  if (!post) return <p>Se încarcă postarea...</p>;
+    deletePost(){
+        API_POSTS.deletePost(this.state.postId, () => {});
+        this.props.history.push('/home');
+    }
 
-  const imageSource = post.image ? "data:image/png;base64, " + post.image : "";
+    handlePostDelete(){
+         this.setState({
+             deleteNotification: true
+         });
+    }
 
-  return (
-    <>
-      <NavigationBar />
-      <div style={{ padding: '2rem 20%' }}>
-        <Card>
-          <CardBody>
-            {/* Username și timpul postării */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '1rem',
-                fontSize: '1.1rem',
-                fontWeight: 'bold'
-                }}>
-                <div>{username}</div>
-                <div style={{ fontSize: '0.9rem', color: 'gray' }}>
-                    {new Date(post.dateCreated).toLocaleString()} • {post.status || 'fără status'}
+    // const timeAgo = (dateString) => {
+    //   const postDate = new Date(dateString);
+    //   const now = new Date();
+    //   const diffMs = now - postDate;
+    //
+    //   const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    //   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    //   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    //
+    //   if (diffMinutes < 1) return 'chiar acum';
+    //   if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    //   if (diffHours < 24) return `${diffHours}h ago`;
+    //   if (diffDays < 7) return `${diffDays}d ago`;
+    //   return postDate.toLocaleDateString('ro-RO');
+    // };
+
+    reload() {
+        this.setState({
+            showEditPostForm: false // hide first
+        }, () => {
+            // reload state AFTER modal is hidden
+            this.setState({
+                post: null,
+                postTags: [],
+                username: 'Utilizator necunoscut',
+                imageSource: null,
+                deleteNotification: false
+            });
+
+            this.fetchPost();
+        });
+    }
+
+    render() {
+        const { user } = this.context;
+
+        return (
+            <div>
+                <NavigationBar/>
+                {!this.state.post ? (
+                    <div>Se incarca postarea...</div>
+                ) : (
+                <div>
+                    <div>
+                        {this.state.deleteNotification && (
+                            <DeletePostNotification
+                                onClose={this.dismissDeletePostNotification}
+                                deletePost={this.deletePost}
+                            />
+                        )}
+                    </div>
+                    <div style={{padding: '2rem 20%'}}>
+                        <Card>
+                            <CardBody>
+                                {/* Username și timpul postării */}
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: '1rem',
+                                    fontSize: '1.1rem',
+                                    fontWeight: 'bold'
+                                }}>
+                                    <div>{this.state.username}</div>
+                                    <div style={{fontSize: '0.9rem', color: 'gray'}}>
+                                        {new Date(this.state.post.dateCreated).toLocaleString()} • {this.state.post.status || 'fără status'}
+                                    </div>
+                                </div>
+
+
+                                {/* Imaginea postării */}
+                                {this.state.imageSource && (
+                                    <img
+                                        src={this.state.imageSource}
+                                        alt="Post"
+                                        style={{
+                                            width: '100%',
+                                            maxHeight: '100%',
+                                            objectFit: 'cover',
+                                            borderRadius: '8px',
+                                            marginBottom: '1rem'
+                                        }}
+                                    />
+                                )}
+
+                                {/* Detalii */}
+                                <CardText><strong>Title:</strong> {this.state.post.title}</CardText>
+                                <CardText><strong>Description:</strong> {this.state.post.text}</CardText>
+                                <CardText>
+                                    <strong>Tags:</strong>{' '}
+                                    {this.state.postTags.length !== 0 ? this.state.postTags
+                                            .sort((a, b) => a.localeCompare(b))
+                                            .map((tag, index) => (
+                                            <span key={index} style={{
+                                                marginRight: '8px',
+                                                background: '#eee',
+                                                padding: '4px 8px',
+                                                borderRadius: '4px'
+                                            }}>
+                            {tag}
+                        </span>
+                                        ))
+                                        : 'N/A'}
+                                </CardText>
+                                <CardText><strong>Scor aprecieri:</strong> {this.state.post.totalVotes}</CardText>
+
+                                <Row>
+                                    <Col>
+                                        <div style={{display: 'flex', gap: '1rem', marginTop: '1rem'}}>
+                                            <Button color="success" onClick={() => alert('Liked!')}>Like</Button>
+                                            <Button color="danger" onClick={() => alert('Disliked!')}>Dislike</Button>
+                                        </div>
+                                    </Col>
+                                    <Col>
+                                        {this.state.post.idPerson === user.idPerson && (
+                                        <div style={{display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'flex-end'}}>
+                                            <Button color="secondary" onClick={this.toggleEditPostForm}>Edit</Button>
+                                            <Button color="danger" onClick={this.handlePostDelete}>Delete</Button>
+                                        </div>
+                                        )}
+                                    </Col>
+                                </Row>
+                            </CardBody>
+                        </Card>
+                        <Modal
+                            isOpen={this.state.showEditPostForm}
+                            toggle={this.toggleEditPostForm}
+                            className={this.props.className}
+                            size="lg"
+                        >
+                            <ModalHeader toggle={this.toggleEditPostForm}>Edit Post:</ModalHeader>
+                            <ModalBody>
+                                <EditPostForm children={{postId: this.state.postId}} reloadHandler={this.reload} />
+                            </ModalBody>
+                        </Modal>
+                    </div>
                 </div>
+                    )}
             </div>
-
-
-            {/* Imaginea postării */}
-            {imageSource && (
-              <img
-                src={imageSource}
-                alt="Post"
-                style={{
-                  width: '100%',
-                  maxHeight: '100%',
-                  objectFit: 'cover',
-                  borderRadius: '8px',
-                  marginBottom: '1rem'
-                }}
-              />
-            )}
-
-            {/* Detalii */}
-            <CardText><strong>Title:</strong> {post.title}</CardText>
-            <CardText><strong>Description:</strong> {post.text}</CardText>
-            <CardText>
-                <strong>Tags:</strong>{' '}
-                {postTags.length !== 0 ? postTags.map((tag, index) => (
-                    <span key={index} style={{ marginRight: '8px', background: '#eee', padding: '4px 8px', borderRadius: '4px' }}>
-                        {tag}
-                    </span>
-                    ))
-                    : 'N/A'}
-            </CardText>
-            <CardText><strong>Scor aprecieri:</strong> {post.totalVotes}</CardText>
-
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-              <Button color="success" onClick={() => alert('Liked!')}>Like</Button>
-              <Button color="danger" onClick={() => alert('Disliked!')}>Dislike</Button>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-    </>
-  );
+        );
+    }
 }
 
 export default PostDetails;
