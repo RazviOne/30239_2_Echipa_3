@@ -188,17 +188,11 @@ class Feed extends React.Component {
                     {this.state.posts.length === 0 && <p>Nu există postări momentan.</p>}
 
                     {this.state.posts
+                        .filter(post => !post.idParent) 
                         .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated))
                         .filter(post => {
-                            if(this.state.postFilterPersonId === 0){
-                                return true;
-                            }
-
-                            if(post.idPerson === this.state.postFilterPersonId){
-                                return true;
-                            }
-
-                            return false;
+                            if (this.state.postFilterPersonId === 0) return true;
+                            return post.idPerson === this.state.postFilterPersonId;
                         })
                         .map((post, idx) => {
                             let imageSource = "";

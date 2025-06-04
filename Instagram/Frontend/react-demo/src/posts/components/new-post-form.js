@@ -12,7 +12,6 @@ import {UserContext} from "../../contexts/UserContext";
 
 
 class NewPostForm extends React.Component {
-
     static contextType = UserContext;
 
     constructor(props) {
@@ -21,16 +20,13 @@ class NewPostForm extends React.Component {
         this.reloadHandler = this.props.reloadHandler;
 
         this.state = {
-
             imageSource: null,
             image: null,
             errorStatus: 0,
             error: null,
-
             formIsValid: false,
-
             formControls: {
-                title:{
+                title: {
                     value: '',
                     placeholder: 'The title of the post...',
                     valid: false,
@@ -40,7 +36,7 @@ class NewPostForm extends React.Component {
                         isRequired: true
                     }
                 },
-                text:{
+                text: {
                     value: '',
                     placeholder: 'Description for the post...',
                     valid: false,
@@ -61,8 +57,6 @@ class NewPostForm extends React.Component {
                     }
                 },
                 image: {
-                    // value: '',
-                    // placeholder: "Cool tags for your post...",
                     valid: true,
                     touched: false
                 }
@@ -74,19 +68,18 @@ class NewPostForm extends React.Component {
     }
 
     toggleForm() {
-        this.setState({collapseForm: !this.state.collapseForm});
+        this.setState({ collapseForm: !this.state.collapseForm });
     }
 
     async handleChange(event) {
-
         const name = event.target.name;
         const isFile = event.target.type === 'file';
 
-        if(isFile){
+        if (isFile) {
             const file = event.target.files[0];
             let imageBase64 = null;
 
-            if(file) {
+            if (file) {
                 imageBase64 = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onloadend = () => resolve(reader.result.split(',')[1]);
@@ -102,9 +95,7 @@ class NewPostForm extends React.Component {
         }
 
         const value = isFile ? 'image' : event.target.value;
-
         const updatedControls = this.state.formControls;
-
         const updatedFormElement = updatedControls[name];
 
         updatedFormElement.value = value;
@@ -121,82 +112,48 @@ class NewPostForm extends React.Component {
             formControls: updatedControls,
             formIsValid: formIsValid
         });
-
-    };
+    }
 
     createPostTag(postTag) {
-        // console.log("Create new postTag: " + postTag);
         return API_POSTTAGS.postPostTag(postTag, (result, status, error) => {
-            if (result !== null && (status === 200 || status === 201)) {
-                // console.log("Successfully registered postTag with id: " + result);
-            } else {
-                this.setState(({
-                    errorStatus: status,
-                    error: error
-                }));
+            if (!(result && (status === 200 || status === 201))) {
+                this.setState({ errorStatus: status, error: error });
             }
         });
     }
 
     createTag(tag, idPost) {
-        // console.log("Create new tag with name: " + tag.name);
-        return API_TAGS.postTag(tag, async(result, status, error) => {
-            if (result !== null && (status === 200 || status === 201)) {
-                // console.log("Successfully registered tag with id: " + result);
-                // console.log("Create new postTag for brand new tag");
-                let postTag = {
-                    idPost: idPost,
-                    idTag: result
-                };
-
+        return API_TAGS.postTag(tag, async (result, status, error) => {
+            if (result && (status === 200 || status === 201)) {
+                let postTag = { idPost: idPost, idTag: result };
                 await this.createPostTag(postTag);
             } else {
-                this.setState(({
-                    errorStatus: status,
-                    error: error
-                }));
+                this.setState({ errorStatus: status, error: error });
             }
         });
     }
 
     processTags(tagNames, idPost) {
         tagNames.forEach(tagName => {
-            // console.log("Find tag with name: " + tagName);
-            API_TAGS.getTagByName(tagName, async(result, status, error) => {
+            API_TAGS.getTagByName(tagName, async (result, status, error) => {
                 if (result.idTag !== -1 && (status === 200 || status === 201)) {
-                    // console.log(result);
-                    // console.log("Create new postTag");
-                    let postTag = {
-                        idPost: idPost,
-                        idTag: result.idTag
-                    };
-
+                    let postTag = { idPost: idPost, idTag: result.idTag };
                     await this.createPostTag(postTag);
                 } else {
-                    // console.log("Create new tag with name: " + tagName);
-                    let newTag = {
-                        name: "#" + tagName
-                    };
-
+                    let newTag = { name: "#" + tagName };
                     await this.createTag(newTag, idPost);
                 }
             });
         });
-
     }
 
     createPost(post) {
-        return API_POSTS.postPost(post, async(result, status, error) => {
-            if (result !== null && (status === 200 || status === 201)) {
-                // alert("Successfully registered post with id: " + result);
+        return API_POSTS.postPost(post, async (result, status, error) => {
+            if (result && (status === 200 || status === 201)) {
                 let tagNames = this.state.formControls.tags.value.replaceAll("#", "").split(" ");
                 await this.processTags(tagNames, result);
-                // console.log("Created new tags and attached everything to new post");
             } else {
-                this.setState(({
-                    errorStatus: status,
-                    error: error
-                }));
+                this.setState({ errorStatus: status, error: error });
             }
         });
     }
@@ -224,14 +181,13 @@ class NewPostForm extends React.Component {
             title: this.state.formControls.title.value,
             text: this.state.formControls.text.value,
             dateCreated: dateCreatedString,
-            status: "just posted",
+            status: "Just Posted", // ✅ Status setat corect
             image: this.state.image,
             totalVotes: 0,
             noMoreComments: false
         };
 
         await this.createPost(post);
-
         this.reloadHandler();
     }
 

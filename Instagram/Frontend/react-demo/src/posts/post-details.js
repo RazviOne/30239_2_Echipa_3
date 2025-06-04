@@ -9,6 +9,9 @@ import { UserContext } from '../contexts/UserContext';
 import DeletePostNotification from "./components/delete-post-notification";
 import EditPostForm from "./components/edit-post-form";
 import * as API_REACTIONS from '../admin/api/reactions-api';
+import NewCommentForm from './components/new-comment-form';
+
+
 
 
 class PostDetails extends React.Component {
@@ -31,22 +34,27 @@ class PostDetails extends React.Component {
             username: 'Utilizator necunoscut',
             imageSource: null,
             deleteNotification: false,
-            showEditPostForm: false
+            showEditPostForm: false,
+            comments: [],
+            commentReactions: {}
+
         }
     }
 
     async componentDidMount() {
-        const url = window.location.pathname;
-        const segments = url.split('/');
-        const postId = parseInt(segments[segments.length - 1]);
+    const url = window.location.pathname;
+    const segments = url.split('/');
+    const postId = parseInt(segments[segments.length - 1]);
 
-        if (!isNaN(postId)) {
-            await this.setState({ postId });
-            this.fetchPost();
-        } else {
-            console.error('ID post invalid:', postId);
-        }
+    if (!isNaN(postId)) {
+        await this.setState({ postId });
+        this.fetchPost();
+        this.fetchComments();
+    } else {
+        console.error('ID post invalid:', postId);
     }
+}
+
 
 
     toggleEditPostForm(){
@@ -97,23 +105,18 @@ class PostDetails extends React.Component {
                 post: result,
                 imageSource: "data:image/png;base64, " + result.image
             }, () => {
-                // apelăm updateVotesCount după ce post-ul a fost setat
                 this.updateVotesCount();
             });
 
             API_USERS.getPersonById(result.idPerson, (res, stat) => {
                 if (res !== null && stat === 200) {
-                    this.setState({
-                        username: res.username
-                    });
+                    this.setState({ username: res.username });
                 }
             });
 
             this.fetchTags(this.state.postId).then((tags) => {
                 if (tags.length !== 0) {
-                    this.setState({
-                        postTags: tags
-                    });
+                    this.setState({ postTags: tags });
                 }
             });
         }
@@ -121,13 +124,127 @@ class PostDetails extends React.Component {
 }
 
 
-    deletePost(){
-        API_POSTS.deletePost(this.state.postId, () => {});
-        this.props.history.push('/home');
-    }
+fetchCommentAuthors(comments) {
+    const userIds = [...new Set(comments.map(c => c.idPerson))]; // elimină duplicatele
 
-    handlePostDelete(){
-         this.setState({
+    const promises = userIds.map(id =>
+        new Promise(resolve => {
+            API_USERS.getPersonById(id, (res, stat) => {
+                if (res !== null && stat === 200) {
+                    resolve({ id, username: res.username });
+                } else {
+                    resolve({ id, username: "Unknown user" });
+                }
+            });
+        })
+    );
+
+    return Promise.all(promises).then(results => {
+        const userMap = {};
+        results.forEach(({ id, username }) => {
+            userMap[id] = username;
+        });
+        return userMap;
+    });
+}
+
+
+fetchCommentReactions(comments) {
+    API_REACTIONS.getReactions((allReactions, status) => {
+        if (status === 200 && Array.isArray(allReactions)) {
+            const reactionMap = {};
+            
+            comments.forEach(comment => {
+                const relevant = allReactions.filter(r => r.idPost === comment.idPost);
+                const total = relevant.reduce((acc, r) => acc + (r.isLiked ? 1 : -1), 0);
+                reactionMap[comment.idPost] = total;
+            });
+            
+            this.setState({ commentReactions: reactionMap });
+        }
+    });
+}
+
+handleLikeComment = (commentId, commentAuthorId) => {
+    const { user } = this.context;
+    
+    if (!user || user.idPerson === commentAuthorId) {
+        alert("You can't vote on your own comment.");
+        return;
+    }
+    
+    API_REACTIONS.getReactions((reactions, status) => {
+        if (status === 200) {
+            const existing = reactions.find(r => r.idPerson === user.idPerson && r.idPost === commentId);
+            
+            if (existing && existing.isLiked === true) {
+                API_REACTIONS.deleteReaction(existing.idReaction, () => this.fetchComments());
+            } else if (existing) {
+                const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: true };
+                API_REACTIONS.updateReaction(existing.idReaction, payload, () => this.fetchComments());
+            } else {
+                const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: true };
+                API_REACTIONS.postReaction(payload, () => this.fetchComments());
+            }
+        }
+    });
+};
+
+handleDislikeComment = (commentId, commentAuthorId) => {
+    const { user } = this.context;
+    
+    if (!user || user.idPerson === commentAuthorId) {
+        alert("You can't vote on your own comment.");
+        return;
+    }
+    
+    API_REACTIONS.getReactions((reactions, status) => {
+        if (status === 200) {
+            const existing = reactions.find(r => r.idPerson === user.idPerson && r.idPost === commentId);
+            
+            if (existing && existing.isLiked === false) {
+                API_REACTIONS.deleteReaction(existing.idReaction, () => this.fetchComments());
+            } else if (existing) {
+                const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: false };
+                API_REACTIONS.updateReaction(existing.idReaction, payload, () => this.fetchComments());
+            } else {
+                const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: false };
+                API_REACTIONS.postReaction(payload, () => this.fetchComments());
+            }
+        }
+    });
+};
+fetchComments() {
+    API_POSTS.getPosts((result, status) => {
+        if (result !== null && status === 200) {
+            const comments = result.filter(post => post.idParent === this.state.postId);
+
+            this.fetchCommentAuthors(comments).then(userMap => {
+                const commentsWithUsers = comments.map(comment => ({
+                    ...comment,
+                    username: userMap[comment.idPerson] || 'Unknown'
+                }));
+
+                this.setState({ comments: commentsWithUsers }, () => {
+                    this.fetchCommentReactions(commentsWithUsers);
+                });
+            });
+        } else {
+            this.setState({ comments: [] });
+        }
+    });
+}
+
+
+
+
+deletePost(){
+    API_POSTS.deletePost(this.state.postId, () => {});
+    this.props.history.push('/home');
+}
+
+handlePostDelete(){
+    this.setState({
              deleteNotification: true
          });
     }
@@ -247,6 +364,24 @@ handleDislike = () => {
   });
 };
 
+handleStopComments = () => {
+  const updatedPost = {
+    ...this.state.post,
+    noMoreComments: true,
+    status: "outdated"
+  };
+
+  API_POSTS.updatePost(this.state.post.idPost, updatedPost, (result, status, err) => {
+    if ((status === 200 || status === 201) && result.idPost !== -1) {
+      this.setState({ post: result });
+      alert("Comments have been disabled for this post.");
+    } else {
+      alert("Failed to disable comments.");
+    }
+  });
+}
+
+
 
 
 
@@ -271,21 +406,22 @@ handleDislike = () => {
     // };
 
     reload() {
+    this.setState({
+        showEditPostForm: false
+    }, () => {
         this.setState({
-            showEditPostForm: false // hide first
-        }, () => {
-            // reload state AFTER modal is hidden
-            this.setState({
-                post: null,
-                postTags: [],
-                username: 'Utilizator necunoscut',
-                imageSource: null,
-                deleteNotification: false
-            });
-
-            this.fetchPost();
+            post: null,
+            postTags: [],
+            username: 'Utilizator necunoscut',
+            imageSource: null,
+            deleteNotification: false
         });
-    }
+
+        this.fetchPost();
+        this.fetchComments();
+    });
+}
+
 
     render() {
         const { user } = this.context;
@@ -308,7 +444,7 @@ handleDislike = () => {
                     <div style={{padding: '2rem 20%'}}>
                         <Card>
                             <CardBody>
-                                {/* Username și timpul postării */}
+                                {/* Autor și data */}
                                 <div style={{
                                     display: 'flex',
                                     justifyContent: 'space-between',
@@ -319,12 +455,11 @@ handleDislike = () => {
                                 }}>
                                     <div>{this.state.username}</div>
                                     <div style={{fontSize: '0.9rem', color: 'gray'}}>
-                                        {new Date(this.state.post.dateCreated).toLocaleString()} • {this.state.post.status || 'fără status'}
+                                        {new Date(this.state.post.dateCreated).toLocaleString()} • {this.state.post.status || 'No status'}
                                     </div>
                                 </div>
 
-
-                                {/* Imaginea postării */}
+                                {/* Imagine */}
                                 {this.state.imageSource && (
                                     <img
                                         src={this.state.imageSource}
@@ -339,27 +474,30 @@ handleDislike = () => {
                                     />
                                 )}
 
-                                {/* Detalii */}
+                                {/* Conținut */}
                                 <CardText><strong>Title:</strong> {this.state.post.title}</CardText>
                                 <CardText><strong>Description:</strong> {this.state.post.text}</CardText>
                                 <CardText>
                                     <strong>Tags:</strong>{' '}
                                     {this.state.postTags.length !== 0 ? this.state.postTags
-                                            .sort((a, b) => a.localeCompare(b))
-                                            .map((tag, index) => (
+                                        .sort((a, b) => a.localeCompare(b))
+                                        .map((tag, index) => (
                                             <span key={index} style={{
                                                 marginRight: '8px',
                                                 background: '#eee',
                                                 padding: '4px 8px',
                                                 borderRadius: '4px'
                                             }}>
-                            {tag}
-                        </span>
+                                                {tag}
+                                            </span>
                                         ))
                                         : 'N/A'}
                                 </CardText>
-                                <CardText><strong>Scor aprecieri:</strong> {this.state.post.totalVotes}</CardText>
 
+                                {/* Voturi */}
+                                <CardText><strong>Votes:</strong> {this.state.post.totalVotes}</CardText>
+
+                                {/* Like / Dislike */}
                                 <Row>
                                     <Col>
                                         <div style={{display: 'flex', gap: '1rem', marginTop: '1rem'}}>
@@ -369,15 +507,31 @@ handleDislike = () => {
                                     </Col>
                                     <Col>
                                         {this.state.post.idPerson === user.idPerson && (
-                                        <div style={{display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'flex-end'}}>
-                                            <Button color="secondary" onClick={this.toggleEditPostForm}>Edit</Button>
-                                            <Button color="danger" onClick={this.handlePostDelete}>Delete</Button>
-                                        </div>
+                                            <div style={{display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'flex-end'}}>
+                                                <Button color="secondary" onClick={this.toggleEditPostForm}>Edit</Button>
+                                                <Button color="danger" onClick={this.handlePostDelete}>Delete</Button>
+                                                {!this.state.post.noMoreComments && (
+                                                    <Button color="warning" onClick={this.handleStopComments}>Stop Comments</Button>
+                                                )}
+                                            </div>
                                         )}
                                     </Col>
                                 </Row>
                             </CardBody>
+
+                            {/* Separator și formular comentariu */}
+                            <hr style={{margin: '0 1rem'}} />
+                            <div style={{padding: '1rem'}}>
+                                <h5>Add a comment</h5>
+                                {!this.state.post.noMoreComments ? (
+                                    <NewCommentForm postId={this.state.postId} reloadComments={this.fetchPost} />
+                                    ) : (
+                                    <p style={{ marginTop: '1rem', color: 'gray' }}>Comments are disabled for this post.</p>
+                                    )}
+                            </div>
                         </Card>
+
+                        
                         <Modal
                             isOpen={this.state.showEditPostForm}
                             toggle={this.toggleEditPostForm}
@@ -389,6 +543,67 @@ handleDislike = () => {
                                 <EditPostForm children={{postId: this.state.postId}} reloadHandler={this.reload} />
                             </ModalBody>
                         </Modal>
+                        {this.state.comments.length > 0 && (
+                            <div style={{ marginTop: '2rem' }}>
+                                <h5>Comments</h5>
+                                {this.state.comments
+                                .sort((a, b) => (this.state.commentReactions[b.idPost] || 0) - (this.state.commentReactions[a.idPost] || 0))
+                                .map((comment) => (
+
+                                    <Card key={comment.idPost} style={{ marginTop: '1rem', padding: '1rem' }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            marginBottom: '0.5rem',
+                                            fontWeight: 'bold',
+                                            fontSize: '0.95rem'
+                                        }}>
+                                            <span>{comment.username}</span>
+                                            <span style={{ color: 'gray' }}>
+                                                {new Date(comment.dateCreated).toLocaleString()} • {comment.status || 'No status'}
+                                            </span>
+                                        </div>
+
+                                        {comment.image && (
+                                            <img
+                                                src={`data:image/png;base64, ${comment.image}`}
+                                                alt="Comment"
+                                                style={{
+                                                    width: '100%',
+                                                    maxHeight: '300px',
+                                                    objectFit: 'cover',
+                                                    marginBottom: '1rem',
+                                                    borderRadius: '8px'
+                                                }}
+                                            />
+                                        )}
+
+                                        <CardText>{comment.text}</CardText>
+                                        <CardText>
+                                            <strong>Votes:</strong> {this.state.commentReactions[comment.idPost] || 0}
+                                        </CardText>
+
+                                        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                                            <Button
+                                                color="success"
+                                                size="sm"
+                                                onClick={() => this.handleLikeComment(comment.idPost, comment.idPerson)}
+                                            >
+                                                Like
+                                            </Button>
+                                            <Button
+                                                color="danger"
+                                                size="sm"
+                                                onClick={() => this.handleDislikeComment(comment.idPost, comment.idPerson)}
+                                            >
+                                                Dislike
+                                            </Button>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        )}
+
                     </div>
                 </div>
                     )}
