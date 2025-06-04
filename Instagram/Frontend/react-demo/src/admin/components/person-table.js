@@ -51,9 +51,9 @@ const columns = [
             let dayData = parseInt(value.substring(8, 10));
             let hourData = parseInt(value.substring(11, 13));
             let minuteData = parseInt(value.substring(14, 16));
-            let secondData = parseInt(value.substring(17, 19));
+            // let secondData = parseInt(value.substring(17, 19));
             // console.log(`Year: ${yearData}\nMonth: ${monthData}\nDay: ${dayData}\nHour: ${hourData}\nMinute: ${minuteData}\nSecond: ${secondData}\n`);
-            let dateString = dayData + '.' + monthData + '.' + yearData + " " + hourData + ':' + minuteData + ':' + secondData;
+            // let dateString = dayData + '.' + monthData + '.' + yearData + " " + hourData + ':' + minuteData + ':' + secondData;
             return dayData.toString().padStart(2, '0') +
                 '.' +
                 monthData.toString().padStart(2, '0') +

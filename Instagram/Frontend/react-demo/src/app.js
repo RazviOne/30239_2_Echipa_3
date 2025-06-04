@@ -1,6 +1,5 @@
 import React from 'react'
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
-import NavigationBar from './navigation-bar'
 import Login from './login/login';
 import PersonContainer from './person/person-container'
 import AdminContainer from './admin/admin-container'
@@ -9,7 +8,6 @@ import PostDetails from './posts/post-details';
 
 import ErrorPage from './commons/errorhandling/error-page';
 import styles from './commons/styles/project-style.css';
-import ProtectedRoute from "./protected-route";
 
 class App extends React.Component {
 

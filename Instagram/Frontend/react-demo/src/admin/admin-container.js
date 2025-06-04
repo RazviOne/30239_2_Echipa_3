@@ -21,7 +21,6 @@ import * as API_TAGS from "./api/tags-api"
 import PersonTable from "./components/person-table";
 import TagTable from "./components/tag-table";
 import { UserContext } from "../contexts/UserContext";
-import {HOST} from "../commons/hosts";
 import NavigationBar from "../navigation-bar";
 
 class AdminContainer extends React.Component {

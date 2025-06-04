@@ -2,7 +2,6 @@ import React from 'react';
 import { Button, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { withRouter } from 'react-router-dom';
 import '@fontsource/pacifico';
-import WhiteLogo from './commons/images/white_logo.png';
 
 
 import InstaIcon from './commons/images/icon.png';

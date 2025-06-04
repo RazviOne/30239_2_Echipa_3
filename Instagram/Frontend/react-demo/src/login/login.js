@@ -21,15 +21,15 @@ import {
 } from 'reactstrap';
 import * as API_USERS from "../admin/api/people-api";
 
-const backgroundStyle = {
-    backgroundPosition: 'center',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    width: "100%",
-    height: "1920px",
-    // backgroundImage: `url(${BackgroundImg})`
-};
-const textStyle = {color: 'white'};
+// const backgroundStyle = {
+//     backgroundPosition: 'center',
+//     backgroundSize: 'cover',
+//     backgroundRepeat: 'no-repeat',
+//     width: "100%",
+//     height: "1920px",
+//     // backgroundImage: `url(${BackgroundImg})`
+// };
+// const textStyle = {color: 'white'};
 
 class Login extends React.Component {
 

@@ -11,9 +11,6 @@ import EditPostForm from "./components/edit-post-form";
 import * as API_REACTIONS from '../admin/api/reactions-api';
 import NewCommentForm from './components/new-comment-form';
 
-
-
-
 class PostDetails extends React.Component {
 
     static contextType = UserContext;
@@ -42,18 +39,18 @@ class PostDetails extends React.Component {
     }
 
     async componentDidMount() {
-    const url = window.location.pathname;
-    const segments = url.split('/');
-    const postId = parseInt(segments[segments.length - 1]);
+        const url = window.location.pathname;
+        const segments = url.split('/');
+        const postId = parseInt(segments[segments.length - 1]);
 
-    if (!isNaN(postId)) {
-        await this.setState({ postId });
-        this.fetchPost();
-        this.fetchComments();
-    } else {
-        console.error('ID post invalid:', postId);
+        if (!isNaN(postId)) {
+            await this.setState({ postId });
+            this.fetchPost();
+            this.fetchComments();
+        } else {
+            console.error('ID post invalid:', postId);
+        }
     }
-}
 
 
 
@@ -94,300 +91,290 @@ class PostDetails extends React.Component {
     };
 
     fetchPost() {
-    if (!this.state.postId) {
-        console.error('Post ID invalid.');
-        return;
-    }
-
-    API_POSTS.getPostById(this.state.postId, (result, status) => {
-        if (result !== null && status === 200) {
-            this.setState({
-                post: result,
-                imageSource: "data:image/png;base64, " + result.image
-            }, () => {
-                this.updateVotesCount();
-            });
-
-            API_USERS.getPersonById(result.idPerson, (res, stat) => {
-                if (res !== null && stat === 200) {
-                    this.setState({ username: res.username });
-                }
-            });
-
-            this.fetchTags(this.state.postId).then((tags) => {
-                if (tags.length !== 0) {
-                    this.setState({ postTags: tags });
-                }
-            });
+        if (!this.state.postId) {
+            console.error('Post ID invalid.');
+            return;
         }
-    });
-}
 
-
-fetchCommentAuthors(comments) {
-    const userIds = [...new Set(comments.map(c => c.idPerson))]; // elimină duplicatele
-
-    const promises = userIds.map(id =>
-        new Promise(resolve => {
-            API_USERS.getPersonById(id, (res, stat) => {
-                if (res !== null && stat === 200) {
-                    resolve({ id, username: res.username });
-                } else {
-                    resolve({ id, username: "Unknown user" });
-                }
-            });
-        })
-    );
-
-    return Promise.all(promises).then(results => {
-        const userMap = {};
-        results.forEach(({ id, username }) => {
-            userMap[id] = username;
-        });
-        return userMap;
-    });
-}
-
-
-fetchCommentReactions(comments) {
-    API_REACTIONS.getReactions((allReactions, status) => {
-        if (status === 200 && Array.isArray(allReactions)) {
-            const reactionMap = {};
-            
-            comments.forEach(comment => {
-                const relevant = allReactions.filter(r => r.idPost === comment.idPost);
-                const total = relevant.reduce((acc, r) => acc + (r.isLiked ? 1 : -1), 0);
-                reactionMap[comment.idPost] = total;
-            });
-            
-            this.setState({ commentReactions: reactionMap });
-        }
-    });
-}
-
-handleLikeComment = (commentId, commentAuthorId) => {
-    const { user } = this.context;
-    
-    if (!user || user.idPerson === commentAuthorId) {
-        alert("You can't vote on your own comment.");
-        return;
-    }
-    
-    API_REACTIONS.getReactions((reactions, status) => {
-        if (status === 200) {
-            const existing = reactions.find(r => r.idPerson === user.idPerson && r.idPost === commentId);
-            
-            if (existing && existing.isLiked === true) {
-                API_REACTIONS.deleteReaction(existing.idReaction, () => this.fetchComments());
-            } else if (existing) {
-                const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: true };
-                API_REACTIONS.updateReaction(existing.idReaction, payload, () => this.fetchComments());
-            } else {
-                const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: true };
-                API_REACTIONS.postReaction(payload, () => this.fetchComments());
-            }
-        }
-    });
-};
-
-handleDislikeComment = (commentId, commentAuthorId) => {
-    const { user } = this.context;
-    
-    if (!user || user.idPerson === commentAuthorId) {
-        alert("You can't vote on your own comment.");
-        return;
-    }
-    
-    API_REACTIONS.getReactions((reactions, status) => {
-        if (status === 200) {
-            const existing = reactions.find(r => r.idPerson === user.idPerson && r.idPost === commentId);
-            
-            if (existing && existing.isLiked === false) {
-                API_REACTIONS.deleteReaction(existing.idReaction, () => this.fetchComments());
-            } else if (existing) {
-                const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: false };
-                API_REACTIONS.updateReaction(existing.idReaction, payload, () => this.fetchComments());
-            } else {
-                const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: false };
-                API_REACTIONS.postReaction(payload, () => this.fetchComments());
-            }
-        }
-    });
-};
-fetchComments() {
-    API_POSTS.getPosts((result, status) => {
-        if (result !== null && status === 200) {
-            const comments = result.filter(post => post.idParent === this.state.postId);
-
-            this.fetchCommentAuthors(comments).then(userMap => {
-                const commentsWithUsers = comments.map(comment => ({
-                    ...comment,
-                    username: userMap[comment.idPerson] || 'Unknown'
-                }));
-
-                this.setState({ comments: commentsWithUsers }, () => {
-                    this.fetchCommentReactions(commentsWithUsers);
+        API_POSTS.getPostById(this.state.postId, (result, status) => {
+            if (result !== null && status === 200) {
+                this.setState({
+                    post: result,
+                    imageSource: "data:image/png;base64, " + result.image
+                }, () => {
+                    this.updateVotesCount();
                 });
-            });
-        } else {
-            this.setState({ comments: [] });
-        }
-    });
-}
 
+                API_USERS.getPersonById(result.idPerson, (res, stat) => {
+                    if (res !== null && stat === 200) {
+                        this.setState({ username: res.username });
+                    }
+                });
 
-
-
-deletePost(){
-    API_POSTS.deletePost(this.state.postId, () => {});
-    this.props.history.push('/home');
-}
-
-handlePostDelete(){
-    this.setState({
-             deleteNotification: true
-         });
+                this.fetchTags(this.state.postId).then((tags) => {
+                    if (tags.length !== 0) {
+                        this.setState({ postTags: tags });
+                    }
+                });
+            }
+        });
     }
 
-    
+
+    fetchCommentAuthors(comments) {
+        const userIds = [...new Set(comments.map(c => c.idPerson))]; // elimină duplicatele
+
+        const promises = userIds.map(id =>
+            new Promise(resolve => {
+                API_USERS.getPersonById(id, (res, stat) => {
+                    if (res !== null && stat === 200) {
+                        resolve({ id, username: res.username });
+                    } else {
+                        resolve({ id, username: "Unknown user" });
+                    }
+                });
+            })
+        );
+
+        return Promise.all(promises).then(results => {
+            const userMap = {};
+            results.forEach(({ id, username }) => {
+                userMap[id] = username;
+            });
+            return userMap;
+        });
+    }
+
+
+    fetchCommentReactions(comments) {
+        API_REACTIONS.getReactions((allReactions, status) => {
+            if (status === 200 && Array.isArray(allReactions)) {
+                const reactionMap = {};
+
+                comments.forEach(comment => {
+                    const relevant = allReactions.filter(r => r.idPost === comment.idPost);
+                    const total = relevant.reduce((acc, r) => acc + (r.isLiked ? 1 : -1), 0);
+                    reactionMap[comment.idPost] = total;
+                });
+
+                this.setState({ commentReactions: reactionMap });
+            }
+        });
+    }
+
+    handleLikeComment = (commentId, commentAuthorId) => {
+        const { user } = this.context;
+
+        if (!user || user.idPerson === commentAuthorId) {
+            alert("You can't vote on your own comment.");
+            return;
+        }
+
+        API_REACTIONS.getReactions((reactions, status) => {
+            if (status === 200) {
+                const existing = reactions.find(r => r.idPerson === user.idPerson && r.idPost === commentId);
+
+                if (existing && existing.isLiked === true) {
+                    API_REACTIONS.deleteReaction(existing.idReaction, () => this.fetchComments());
+                } else if (existing) {
+                    const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: true };
+                    API_REACTIONS.updateReaction(existing.idReaction, payload, () => this.fetchComments());
+                } else {
+                    const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: true };
+                    API_REACTIONS.postReaction(payload, () => this.fetchComments());
+                }
+            }
+        });
+    };
+
+    handleDislikeComment = (commentId, commentAuthorId) => {
+        const { user } = this.context;
+
+        if (!user || user.idPerson === commentAuthorId) {
+            alert("You can't vote on your own comment.");
+            return;
+        }
+
+        API_REACTIONS.getReactions((reactions, status) => {
+            if (status === 200) {
+                const existing = reactions.find(r => r.idPerson === user.idPerson && r.idPost === commentId);
+
+                if (existing && existing.isLiked === false) {
+                    API_REACTIONS.deleteReaction(existing.idReaction, () => this.fetchComments());
+                } else if (existing) {
+                    const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: false };
+                    API_REACTIONS.updateReaction(existing.idReaction, payload, () => this.fetchComments());
+                } else {
+                    const payload = { idPerson: user.idPerson, idPost: commentId, isLiked: false };
+                    API_REACTIONS.postReaction(payload, () => this.fetchComments());
+                }
+            }
+        });
+    };
+
+    fetchComments() {
+        API_POSTS.getPosts((result, status) => {
+            if (result !== null && status === 200) {
+                const comments = result.filter(post => post.idParent === this.state.postId);
+
+                this.fetchCommentAuthors(comments).then(userMap => {
+                    const commentsWithUsers = comments.map(comment => ({
+                        ...comment,
+                        username: userMap[comment.idPerson] || 'Unknown'
+                    }));
+
+                    this.setState({ comments: commentsWithUsers }, () => {
+                        this.fetchCommentReactions(commentsWithUsers);
+                    });
+                });
+            } else {
+                this.setState({ comments: [] });
+            }
+        });
+    }
+
+    deletePost(){
+        API_POSTS.deletePost(this.state.postId, () => {});
+        this.props.history.push('/home');
+    }
+
+    handlePostDelete(){
+        this.setState({ deleteNotification: true });
+    }
 
     updateVotesCount() {
-    const { postId } = this.state;
+        const { postId } = this.state;
 
-    API_REACTIONS.getReactions((allReactions, status) => {
-        if (status === 200 && Array.isArray(allReactions)) {
-        const relevant = allReactions.filter(r => r.idPost === postId);
-        const totalVotes = relevant.reduce((acc, r) => acc + (r.isLiked ? 1 : -1), 0);
-        
-        this.setState(prev => ({
-            post: {
-            ...prev.post,
-            totalVotes: totalVotes
+        API_REACTIONS.getReactions((allReactions, status) => {
+            if (status === 200 && Array.isArray(allReactions)) {
+            const relevant = allReactions.filter(r => r.idPost === postId);
+            const totalVotes = relevant.reduce((acc, r) => acc + (r.isLiked ? 1 : -1), 0);
+
+            this.setState(prev => ({
+                post: {
+                ...prev.post,
+                totalVotes: totalVotes
+                }
+            }));
             }
-        }));
-        }
-    });
-}
+        });
+    }
 
     handleLike = () => {
-  const { user } = this.context;
-  const { postId, post } = this.state;
+        const { user } = this.context;
+        const { postId, post } = this.state;
 
-  if (!user || !user.idPerson || !post) return;
+        if (!user || !user.idPerson || !post) return;
 
-  if (user.idPerson === post.idPerson) {
-    alert("You can't vote on your own post.");
-    return;
-  }
+        if (user.idPerson === post.idPerson) {
+            alert("You can't vote on your own post.");
+            return;
+        }
 
-  API_REACTIONS.getReactions((allReactions, status) => {
-    if (status === 200 && Array.isArray(allReactions)) {
-      const existing = allReactions.find(
-        r => r.idPerson === user.idPerson && r.idPost === postId
-      );
+        API_REACTIONS.getReactions((allReactions, status) => {
+            if (status === 200 && Array.isArray(allReactions)) {
+                const existing = allReactions.find(
+                    r => r.idPerson === user.idPerson && r.idPost === postId
+                );
 
-      if (existing && existing.isLiked === true) {
-        API_REACTIONS.deleteReaction(existing.idReaction, () => {
-        //   alert("Like removed.");
-          this.fetchPost();
+                if (existing && existing.isLiked === true) {
+                    API_REACTIONS.deleteReaction(existing.idReaction, () => {
+                        // alert("Like removed.");
+                        this.fetchPost();
+                    });
+                } else if (existing) {
+                    const payload = {
+                        idPerson: user.idPerson,
+                        idPost: postId,
+                        isLiked: true,
+                    };
+
+                    API_REACTIONS.updateReaction(existing.idReaction, payload, () => {
+                        alert("Reaction changed to Like.");
+                        this.fetchPost();
+                    });
+                } else {
+                    const payload = {
+                        idPerson: user.idPerson,
+                        idPost: postId,
+                        isLiked: true,
+                    };
+
+                    API_REACTIONS.postReaction(payload, () => {
+                        //   alert("Liked.");
+                          this.fetchPost();
+                    });
+                }
+            }
         });
-      } else if (existing) {
-        const payload = {
-          idPerson: user.idPerson,
-          idPost: postId,
-          isLiked: true,
+    };
+
+
+    handleDislike = () => {
+        const { user } = this.context;
+        const { postId, post } = this.state;
+
+        if (!user || !user.idPerson || !post) return;
+
+        if (user.idPerson === post.idPerson) {
+            alert("You can't vote on your own post.");
+            return;
+        }
+
+        API_REACTIONS.getReactions((allReactions, status) => {
+            if (status === 200 && Array.isArray(allReactions)) {
+                const existing = allReactions.find(
+                    r => r.idPerson === user.idPerson && r.idPost === postId
+                );
+
+                if (existing && existing.isLiked === false) {
+                    API_REACTIONS.deleteReaction(existing.idReaction, () => {
+                        //   alert("Dislike removed.");
+                          this.fetchPost();
+                    });
+                } else if (existing) {
+                    const payload = {
+                        idPerson: user.idPerson,
+                        idPost: postId,
+                        isLiked: false,
+                    };
+
+                    API_REACTIONS.updateReaction(existing.idReaction, payload, () => {
+                        alert("Reaction changed to Dislike.");
+                        this.fetchPost();
+                    });
+                } else {
+                    const payload = {
+                        idPerson: user.idPerson,
+                        idPost: postId,
+                        isLiked: false,
+                    };
+
+                    API_REACTIONS.postReaction(payload, () => {
+                        //   alert("Disliked.");
+                        this.fetchPost();
+                    });
+                }
+            }
+        });
+    };
+
+    handleStopComments = () => {
+        const updatedPost = {
+            ...this.state.post,
+            noMoreComments: true,
+            status: "outdated"
         };
-        API_REACTIONS.updateReaction(existing.idReaction, payload, () => {
-          alert("Reaction changed to Like.");
-          this.fetchPost();
+
+        API_POSTS.updatePost(this.state.post.idPost, updatedPost, (result, status, err) => {
+            if ((status === 200 || status === 201) && result.idPost !== -1) {
+                this.setState({ post: result });
+                alert("Comments have been disabled for this post.");
+            } else {
+                alert("Failed to disable comments.");
+            }
         });
-      } else {
-        const payload = {
-          idPerson: user.idPerson,
-          idPost: postId,
-          isLiked: true,
-        };
-        API_REACTIONS.postReaction(payload, () => {
-        //   alert("Liked.");
-          this.fetchPost();
-        });
-      }
     }
-  });
-};
-
-
-handleDislike = () => {
-  const { user } = this.context;
-  const { postId, post } = this.state;
-
-  if (!user || !user.idPerson || !post) return;
-
-  if (user.idPerson === post.idPerson) {
-    alert("You can't vote on your own post.");
-    return;
-  }
-
-  API_REACTIONS.getReactions((allReactions, status) => {
-    if (status === 200 && Array.isArray(allReactions)) {
-      const existing = allReactions.find(
-        r => r.idPerson === user.idPerson && r.idPost === postId
-      );
-
-      if (existing && existing.isLiked === false) {
-        API_REACTIONS.deleteReaction(existing.idReaction, () => {
-        //   alert("Dislike removed.");
-          this.fetchPost();
-        });
-      } else if (existing) {
-        const payload = {
-          idPerson: user.idPerson,
-          idPost: postId,
-          isLiked: false,
-        };
-        API_REACTIONS.updateReaction(existing.idReaction, payload, () => {
-          alert("Reaction changed to Dislike.");
-          this.fetchPost();
-        });
-      } else {
-        const payload = {
-          idPerson: user.idPerson,
-          idPost: postId,
-          isLiked: false,
-        };
-        API_REACTIONS.postReaction(payload, () => {
-        //   alert("Disliked.");
-          this.fetchPost();
-        });
-      }
-    }
-  });
-};
-
-handleStopComments = () => {
-  const updatedPost = {
-    ...this.state.post,
-    noMoreComments: true,
-    status: "outdated"
-  };
-
-  API_POSTS.updatePost(this.state.post.idPost, updatedPost, (result, status, err) => {
-    if ((status === 200 || status === 201) && result.idPost !== -1) {
-      this.setState({ post: result });
-      alert("Comments have been disabled for this post.");
-    } else {
-      alert("Failed to disable comments.");
-    }
-  });
-}
-
-
-
-
-
-
-
-
 
     // const timeAgo = (dateString) => {
     //   const postDate = new Date(dateString);
@@ -406,21 +393,21 @@ handleStopComments = () => {
     // };
 
     reload() {
-    this.setState({
-        showEditPostForm: false
-    }, () => {
         this.setState({
-            post: null,
-            postTags: [],
-            username: 'Utilizator necunoscut',
-            imageSource: null,
-            deleteNotification: false
-        });
+            showEditPostForm: false
+        }, () => {
+            this.setState({
+                post: null,
+                postTags: [],
+                username: 'Utilizator necunoscut',
+                imageSource: null,
+                deleteNotification: false
+            });
 
-        this.fetchPost();
-        this.fetchComments();
-    });
-}
+            this.fetchPost();
+            this.fetchComments();
+        });
+    }
 
 
     render() {
