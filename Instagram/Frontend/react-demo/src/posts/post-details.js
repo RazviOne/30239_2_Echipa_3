@@ -10,6 +10,8 @@ import DeletePostNotification from "./components/delete-post-notification";
 import EditPostForm from "./components/edit-post-form";
 import * as API_REACTIONS from '../admin/api/reactions-api';
 import NewCommentForm from './components/new-comment-form';
+import EditCommentForm from './components/edit-comment-form';
+
 
 class PostDetails extends React.Component {
 
@@ -33,7 +35,9 @@ class PostDetails extends React.Component {
             deleteNotification: false,
             showEditPostForm: false,
             comments: [],
-            commentReactions: {}
+            commentReactions: {},
+            showEditCommentForm: false,
+            selectedCommentId: null
 
         }
     }
@@ -376,6 +380,20 @@ class PostDetails extends React.Component {
         });
     }
 
+    toggleEditCommentForm = (commentId) => {
+        this.setState({
+            showEditCommentForm: true,
+            selectedCommentId: commentId
+        });
+    };
+
+    handleDeleteComment = (commentId) => {
+        API_POSTS.deletePost(commentId, () => {
+            this.fetchComments();
+        });
+    };
+
+
     // const timeAgo = (dateString) => {
     //   const postDate = new Date(dateString);
     //   const now = new Date();
@@ -570,26 +588,53 @@ class PostDetails extends React.Component {
                                             <strong>Votes:</strong> {this.state.commentReactions[comment.idPost] || 0}
                                         </CardText>
 
-                                        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                                        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', justifyContent: 'space-between' }}>
+                                        <div style={{ display: 'flex', gap: '1rem' }}>
                                             <Button
-                                                color="success"
-                                                size="sm"
-                                                onClick={() => this.handleLikeComment(comment.idPost, comment.idPerson)}
+                                            color="success"
+                                            size="sm"
+                                            onClick={() => this.handleLikeComment(comment.idPost, comment.idPerson)}
                                             >
-                                                Like
+                                            Like
                                             </Button>
                                             <Button
-                                                color="danger"
-                                                size="sm"
-                                                onClick={() => this.handleDislikeComment(comment.idPost, comment.idPerson)}
+                                            color="danger"
+                                            size="sm"
+                                            onClick={() => this.handleDislikeComment(comment.idPost, comment.idPerson)}
                                             >
-                                                Dislike
+                                            Dislike
                                             </Button>
                                         </div>
+
+                                        {comment.idPerson === user.idPerson && (
+                                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                            <Button color="secondary" size="sm" onClick={() => this.toggleEditCommentForm(comment.idPost)}>Edit</Button>
+                                            <Button color="danger" size="sm" onClick={() => this.handleDeleteComment(comment.idPost)}>Delete</Button>
+                                            </div>
+                                        )}
+                                        </div>
+
+
                                     </Card>
                                 ))}
                             </div>
                         )}
+                        <Modal
+                            isOpen={this.state.showEditCommentForm}
+                            toggle={() => this.setState({ showEditCommentForm: false })}
+                            size="lg"
+                            >
+                            <ModalHeader toggle={() => this.setState({ showEditCommentForm: false })}>
+                                Edit Comment
+                            </ModalHeader>
+                            <ModalBody>
+                                <EditCommentForm
+                                children={{ postId: this.state.selectedCommentId }}
+                                reloadHandler={this.fetchComments.bind(this)}
+                                />
+                            </ModalBody>
+                        </Modal>
+
 
                     </div>
                 </div>
