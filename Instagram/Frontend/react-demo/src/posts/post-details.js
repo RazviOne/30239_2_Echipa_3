@@ -11,6 +11,8 @@ import EditPostForm from "./components/edit-post-form";
 import * as API_REACTIONS from '../admin/api/reactions-api';
 import NewCommentForm from './components/new-comment-form';
 import EditCommentForm from './components/edit-comment-form';
+import { calculateUserScores } from '../utils/score-utils';
+
 
 
 class PostDetails extends React.Component {
@@ -37,7 +39,8 @@ class PostDetails extends React.Component {
             comments: [],
             commentReactions: {},
             showEditCommentForm: false,
-            selectedCommentId: null
+            selectedCommentId: null,
+            userScores: {}
 
         }
     }
@@ -120,6 +123,7 @@ class PostDetails extends React.Component {
                         this.setState({ postTags: tags });
                     }
                 });
+                
             }
         });
     }
@@ -217,25 +221,35 @@ class PostDetails extends React.Component {
     };
 
     fetchComments() {
-        API_POSTS.getPosts((result, status) => {
-            if (result !== null && status === 200) {
-                const comments = result.filter(post => post.idParent === this.state.postId);
+    API_POSTS.getPosts((result, status) => {
+        if (result !== null && status === 200) {
+            const comments = result.filter(post => post.idParent === this.state.postId);
 
-                this.fetchCommentAuthors(comments).then(userMap => {
-                    const commentsWithUsers = comments.map(comment => ({
-                        ...comment,
-                        username: userMap[comment.idPerson] || 'Unknown'
-                    }));
+            this.fetchCommentAuthors(comments).then(userMap => {
+                const commentsWithUsers = comments.map(comment => ({
+                    ...comment,
+                    username: userMap[comment.idPerson] || 'Unknown'
+                }));
 
-                    this.setState({ comments: commentsWithUsers }, () => {
-                        this.fetchCommentReactions(commentsWithUsers);
+                this.setState({ comments: commentsWithUsers }, () => {
+                    this.fetchCommentReactions(commentsWithUsers);
+
+                    // După reacții, calculăm scorurile
+                    API_REACTIONS.getReactions((reactions, status) => {
+                        if (status === 200) {
+                            const allPosts = [this.state.post, ...commentsWithUsers];
+                            const scores = calculateUserScores(allPosts, reactions);
+                            this.setState({ userScores: scores });
+                        }
                     });
                 });
-            } else {
-                this.setState({ comments: [] });
-            }
-        });
-    }
+            });
+        } else {
+            this.setState({ comments: [] });
+        }
+    });
+}
+
 
     deletePost(){
         API_POSTS.deletePost(this.state.postId, () => {});
@@ -260,6 +274,7 @@ class PostDetails extends React.Component {
                 totalVotes: totalVotes
                 }
             }));
+
             }
         });
     }
@@ -393,6 +408,8 @@ class PostDetails extends React.Component {
         });
     };
 
+    
+
 
     // const timeAgo = (dateString) => {
     //   const postDate = new Date(dateString);
@@ -458,7 +475,7 @@ class PostDetails extends React.Component {
                                     fontSize: '1.1rem',
                                     fontWeight: 'bold'
                                 }}>
-                                    <div>{this.state.username}</div>
+                                    <div>{this.state.username}({this.state.userScores?.[this.state.post.idPerson] || 0} pts)</div>
                                     <div style={{fontSize: '0.9rem', color: 'gray'}}>
                                         {new Date(this.state.post.dateCreated).toLocaleString()} • {this.state.post.status || 'No status'}
                                     </div>
@@ -563,7 +580,8 @@ class PostDetails extends React.Component {
                                             fontWeight: 'bold',
                                             fontSize: '0.95rem'
                                         }}>
-                                            <span>{comment.username}</span>
+                                            <span>{comment.username}({this.state.userScores?.[comment.idPerson] || 0} pts)</span>
+
                                             <span style={{ color: 'gray' }}>
                                                 {new Date(comment.dateCreated).toLocaleString()} • {comment.status || 'No status'}
                                             </span>

@@ -2,6 +2,9 @@ import React from 'react';
 import { UserContext } from '../contexts/UserContext';
 import * as API_POSTS from '../admin/api/posts-api';
 import * as API_USERS from '../admin/api/people-api';
+import { calculateUserScores } from '../utils/score-utils';
+import * as API_REACTIONS from '../admin/api/reactions-api';
+
 import {
     Card,
     CardBody,
@@ -38,17 +41,32 @@ class Feed extends React.Component {
             usernamesDropdownIsOpen: false,
             postFilterPersonId: 0,
             errorMessage: '',
-            errorStatus: 0
+            errorStatus: 0,
+            userScores: {}
         };
 
         this.showPostsFromUser = this.showPostsFromUser.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
     }
+    fetchAllPostsAndReactions = () => {
+    API_POSTS.getPosts((posts, status1) => {
+        if (status1 === 200 && posts) {
+            API_REACTIONS.getReactions((reactions, status2) => {
+                if (status2 === 200 && reactions) {
+                    const scores = calculateUserScores(posts, reactions);
+                    this.setState({ userScores: scores });
+                }
+            });
+        }
+    });
+}
+
 
     componentDidMount() {
         // this.protectRoute();
         this.fetchPosts();
         this.fetchUsernames();
+        this.fetchAllPostsAndReactions();
     }
 
     handleInputChange(event) {
@@ -158,7 +176,7 @@ class Feed extends React.Component {
                                 toggle={this.toggleUsernamesDropdown}
                                 direction="down"
                             >
-                                <DropdownToggle color="primary" caret>Username</DropdownToggle>
+                                <DropdownToggle color="primary" caret>Username </DropdownToggle>
                                 <DropdownMenu>
                                     <DropdownItem key="0" value="0" onClick={this.showPostsFromUser}>All Users</DropdownItem>
                                     {Object.values(this.state.usernames)
@@ -216,15 +234,14 @@ class Feed extends React.Component {
                                 >
                                     <CardBody style={{marginLeft: 'auto', marginRight: 'auto'}}>
                                         <div style={{fontWeight: 'bold', marginBottom: '0.5rem'}}>
-                                            {this.state.usernames.find(username => username.id === post.idPerson).username}
+                                            {this.state.usernames.find(username => username.id === post.idPerson)?.username}
                                             <span style={{
-                                            color: 'gray',
-                                            fontSize: '0.9rem'
+                                                color: 'gray',
+                                                fontSize: '0.9rem'
                                             }}>
-                                                • {this.timeAgo(post.dateCreated)}
+                                                • {this.timeAgo(post.dateCreated)} • Score: {this.state.userScores[post.idPerson] || 0}
                                             </span>
                                         </div>
-
                                         {imageSource && (
                                             <img
                                                 src={imageSource}
