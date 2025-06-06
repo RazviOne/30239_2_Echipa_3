@@ -91,9 +91,14 @@ class Login extends React.Component {
                     homeCity: result.homeCity
                 };
 
-                login(userData);
+                if(result.isBanned){
+                    alert("User banned");
+                }
+                else{
+                    login(userData);
 
-                this.props.history.push('/home');
+                    this.props.history.push('/home');
+                }
             } else {
                 // alert('Authentication failed');
                 console.log('Error message:');
