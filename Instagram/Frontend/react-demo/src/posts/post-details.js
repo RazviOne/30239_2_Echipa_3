@@ -123,7 +123,6 @@ class PostDetails extends React.Component {
                         this.setState({ postTags: tags });
                     }
                 });
-                
             }
         });
     }
@@ -528,7 +527,7 @@ class PostDetails extends React.Component {
                                         </div>
                                     </Col>
                                     <Col>
-                                        {(user &&(this.state.post.idPerson === user.idPerson || user.status === 2)) && (
+                                        {(user && ((this.state.post.idPerson === user.idPerson || user.status === 2) || user.isAdmin === true)) && (
                                             <div style={{display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'flex-end'}}>
                                                 <Button color="secondary" onClick={this.toggleEditPostForm}>Edit</Button>
                                                 <Button color="danger" onClick={this.handlePostDelete}>Delete</Button>
@@ -624,7 +623,7 @@ class PostDetails extends React.Component {
                                             </Button>
                                         </div>
 
-                                        {(user &&(comment.idPerson === user.idPerson || user.status === 2)) && (
+                                        {(user && ((comment.idPerson === user.idPerson || user.status === 2)) || user.isAdmin === true) && (
                                             <div style={{ display: 'flex', gap: '1rem' }}>
                                             <Button color="secondary" size="sm" onClick={() => this.toggleEditCommentForm(comment.idPost)}>Edit</Button>
                                             <Button color="danger" size="sm" onClick={() => this.handleDeleteComment(comment.idPost)}>Delete</Button>

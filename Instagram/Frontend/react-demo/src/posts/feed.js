@@ -15,13 +15,16 @@ import {
     ModalBody,
     Modal,
     Dropdown,
-    DropdownToggle, DropdownMenu, DropdownItem, Row, Col
+    DropdownToggle, DropdownMenu, DropdownItem, Row, Col, Input
 } from 'reactstrap';
 // import LogoImg from '../commons/images/Instagram_login_Logo.png';
 // import UserImg from '../commons/images/user.png';
 import NavigationBar from "../navigation-bar";
 // import RegisterPersonForm from "../login/components/register-person-form";
 import NewPostForm from "./components/new-post-form";
+import * as API_POSTTAGS from "../admin/api/postTags-api";
+import * as API_TAGS from "../admin/api/tags-api";
+import {post} from "axios";
 
 class Feed extends React.Component {
 
@@ -32,14 +35,19 @@ class Feed extends React.Component {
 
         this.toggleNewPostForm = this.toggleNewPostForm.bind(this);
         this.toggleUsernamesDropdown = this.toggleUsernamesDropdown.bind(this);
+        this.handleTitleFilter = this.handleTitleFilter.bind(this);
+        this.handleTagFilter = this.handleTagFilter.bind(this);
         this.reload = this.reload.bind(this);
 
         this.state = {
             posts: [],
             usernames: [],
+            postTags: [],
             showNewPostForm: false,
             usernamesDropdownIsOpen: false,
             postFilterPersonId: 0,
+            titleFilter: '',
+            tagFilter: '',
             errorMessage: '',
             errorStatus: 0,
             userScores: {}
@@ -74,6 +82,24 @@ class Feed extends React.Component {
         this.setState({ [name]: value, errorMessage: '' });
     }
 
+    handleTitleFilter(event) {
+        const { name, value } = event.target;
+        // console.log("Name: " + name);
+        // console.log("Value: " + value);
+        this.setState({
+            titleFilter: value
+        });
+    }
+
+    handleTagFilter(event) {
+        const { name, value } = event.target;
+        console.log("Name: " + name);
+        console.log("Value: " + value);
+        this.setState({
+            tagFilter: value
+        });
+    }
+
     toggleNewPostForm() {
         this.setState({ showNewPostForm: !this.state.showNewPostForm });
     }
@@ -88,17 +114,58 @@ class Feed extends React.Component {
         this.reload();
     }
 
+    fetchTags(id) {
+        return new Promise((resolve, reject) => {
+            API_POSTTAGS.getPostTagByPostId(id, (result, status, error) => {
+                if (status === 200 && result) {
+                    const tagPromises = result.map(postTag =>
+                        new Promise((resTag) => {
+                            API_TAGS.getTagById(postTag.idTag, (tagResult, tagStatus) => {
+                                if (tagStatus === 200 && tagResult) {
+                                    resTag(tagResult.name);
+                                } else {
+                                    resTag(null);
+                                }
+                            });
+                        })
+                    );
+
+                    Promise.all(tagPromises).then(names => {
+                        resolve(names.filter(name => name !== null));
+                    });
+                } else {
+                    resolve([]);
+                }
+            });
+        });
+    };
+
     fetchPosts(){
-        API_POSTS.getPosts(async(result, status, error) => {
+        API_POSTS.getPosts(async (result, status, error) => {
             if (result !== null && status === 200) {
-                this.setState({
-                    posts: result
-                })
+                this.setState({ posts: result });
+
+                const tagPromises = result.map(async (post) => {
+                    const tags = await this.fetchTags(post.idPost);
+                    return {
+                        postId: post.idPost,
+                        tags: tags.length > 0 ? tags : ['N/A']
+                    };
+                });
+
+                const tagResults = await Promise.all(tagPromises);
+
+                const postTags = {};
+                tagResults.forEach(({postId, tags}) => {
+                    postTags[postId] = tags;
+                });
+
+                this.setState({ postTags: postTags });
             } else {
                 console.error("Eroare la obținerea postărilor:", error);
             }
         });
-    }
+    };
 
     fetchUsernames(){
         API_USERS.getPersons((result, status, error) => {
@@ -180,12 +247,26 @@ class Feed extends React.Component {
                                 <DropdownMenu>
                                     <DropdownItem key="0" value="0" onClick={this.showPostsFromUser}>All Users</DropdownItem>
                                     {Object.values(this.state.usernames)
-                                        .sort((a, b) => a.username.localeCompare(b.username)) // Alphabetical sort
+                                        .sort((a, b) => a.username.localeCompare(b.username))
                                         .map((obj) => (
                                             <DropdownItem key={obj.id} value={obj.id} onClick={this.showPostsFromUser}>{obj.username}</DropdownItem>
                                         ))}
                                 </DropdownMenu>
                             </Dropdown>
+                        </Col>
+                        <Col>
+                            <Input name='titleFilter' id='titleFilterField' placeholder="Filter post's title..."
+                                   onChange={this.handleTitleFilter}
+                                   defaultValue=""
+                                   bsSize="sm"
+                            />
+                        </Col>
+                        <Col>
+                            <Input name='tagFilter' id='tagFilterField' placeholder="Filter posts by tags..."
+                                   onChange={this.handleTagFilter}
+                                   defaultValue=""
+                                   bsSize="sm"
+                            />
                         </Col>
                     </Row>
 
@@ -211,6 +292,25 @@ class Feed extends React.Component {
                         .filter(post => {
                             if (this.state.postFilterPersonId === 0) return true;
                             return post.idPerson === this.state.postFilterPersonId;
+                        })
+                        .filter(post => {
+                            if(this.state.titleFilter === '') return true;
+                            // console.log("Titlu postare: " + post.title.toUpperCase());
+                            // console.log("Filtru postare: " + this.state.titleFilter.toUpperCase());
+                            return post.title.toUpperCase().includes(this.state.titleFilter.toUpperCase());
+                        })
+                        .filter(post => {
+                            // console.log("Tag filter: " + this.state.tagFilter.toUpperCase());
+                            if(this.state.tagFilter === '') return true;
+                            if(this.state.postTags[post.idPost] === undefined) return true;
+
+                            for(let i = 0; i < this.state.postTags[post.idPost].length; i++){
+                                // console.log('Post: ' + post.title + '\nTag: ' + this.state.postTags[post.idPost][i].toUpperCase());
+                                if(this.state.postTags[post.idPost][i].toString().toUpperCase()
+                                    .includes(this.state.tagFilter.toString().toUpperCase())) return true;
+                            }
+
+                            return false;
                         })
                         .map((post, idx) => {
                             let imageSource = "";
@@ -260,6 +360,32 @@ class Feed extends React.Component {
                                             {post.title}
                                         </CardTitle>
                                         <CardText>{post.text}</CardText>
+                                        <CardText>
+                                            <strong>Tags:</strong>{' '}
+                                            {this.state.postTags[post.idPost] !== undefined && (
+                                                this.state.postTags[post.idPost][0] === 'N/A' ? (
+                                                    <span key="post.idPost" style={{
+                                                        marginRight: '8px',
+                                                        background: '#eee',
+                                                        padding: '4px 8px',
+                                                        borderRadius: '4px'
+                                                    }}>
+                                                        {this.state.postTags[post.idPost]}
+                                                    </span>
+                                                ) : (
+                                                    this.state.postTags[post.idPost].map((tag, index) => (
+                                                        <span key={`${post.idPost}-${index}`} style={{
+                                                            marginRight: '8px',
+                                                            background: '#eee',
+                                                            padding: '4px 8px',
+                                                            borderRadius: '4px'
+                                                        }}>
+                                                            {tag}
+                                                        </span>
+                                                    ))
+                                                )
+                                            )}
+                                        </CardText>
                                     </CardBody>
                                 </Card>
                             )
