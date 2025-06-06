@@ -81,4 +81,13 @@ public class PersonService {
         return null;
     }
 
+    public void banUser(Integer idPerson){
+        PersonDTO dto = findPersonById(idPerson);
+
+        EmailService emailService = new EmailService();
+        emailService.sendEmail(dto.getUsername());
+
+        SMSService smsService = new SMSService();
+        smsService.sendSMS();
+    }
 }

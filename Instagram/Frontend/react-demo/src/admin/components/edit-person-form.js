@@ -16,6 +16,7 @@ class EditPersonForm extends React.Component {
 
         this.state = {
 
+            wasBanned: null,
             errorStatus: 0,
             error: null,
 
@@ -175,6 +176,7 @@ class EditPersonForm extends React.Component {
             if (result !== null && (status === 200 || status === 201)) {
                 console.log("Successfully fetched person with id: " + idPerson);
                 this.setState(prevState => ({
+                    wasBanned: result.isBanned,
                     formControls: {
                         ...prevState.formControls,
                         name: { ...prevState.formControls.name, value: result.name, valid: true},
@@ -191,6 +193,7 @@ class EditPersonForm extends React.Component {
                 }));
             } else {
                 this.setState(prevState => ({
+                    wasBanned: null,
                     formControls: {
                         ...prevState.formControls,
                         name: { ...prevState.formControls.name, value: '', valid: false},
@@ -226,6 +229,19 @@ class EditPersonForm extends React.Component {
         });
     }
 
+    handleBanUser(idPerson){
+        console.log('Notifify user about ban via E-Mail & SMS');
+
+        API_PEOPLE.banPerson(idPerson, (result, status, error) => {
+            if(result !== null && (status === 200 || status === 201)){
+                console.log('A mers ban-ul');
+            }
+            else{
+                console.log('Nu a mers ban-ul');
+            }
+        });
+    }
+
     handleSubmit = () => {
         let person = {
             idPerson: this.state.formControls.idPerson.value,
@@ -241,6 +257,11 @@ class EditPersonForm extends React.Component {
             homeCity: this.state.formControls.homeCity.value
         };
 
+        if(this.state.wasBanned !== this.state.formControls.isBanned &&
+            this.state.wasBanned === false){
+            console.log('The user will be banned');
+            this.handleBanUser(this.state.formControls.idPerson.value);
+        }
         console.log(person);
         this.updatePerson(person);
     }

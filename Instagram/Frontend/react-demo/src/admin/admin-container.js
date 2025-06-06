@@ -55,8 +55,23 @@ class AdminContainer extends React.Component {
 
     componentDidMount() {
         // this.protectRoute();
-        this.fetchPersons();
-        this.fetchTags();
+        const { user } = this.context;
+
+        // console.log("Admin: " + user.isAdmin);
+
+        if(user === null){
+            alert('Ai zburat.')
+            this.props.history.push('/');
+        }
+
+        if((!user.isAdmin)){
+            alert("You're not an admin");
+            this.props.history.push('/home');
+        }
+        else{
+            this.fetchPersons();
+            this.fetchTags();
+        }
     }
 
     // protectRoute() {

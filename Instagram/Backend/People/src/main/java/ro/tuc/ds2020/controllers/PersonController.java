@@ -134,4 +134,17 @@ public class PersonController {
         }
     }
 
+    @GetMapping(value = "/ban/{id}")
+    public ResponseEntity<PersonDTO> banPersonById(@PathVariable("id") Integer idPerson) {
+        PersonDTO failedDto = new PersonDTO();
+        failedDto.setIdPerson(-1);
+        try {
+            PersonDTO dto = personService.findPersonById(idPerson);
+            personService.banUser(idPerson);
+            return new ResponseEntity<>(dto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(failedDto, HttpStatus.NOT_FOUND);
+        }
+    }
+
 }

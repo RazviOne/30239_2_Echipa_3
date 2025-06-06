@@ -20,4 +20,5 @@ public class Ds2020Application extends SpringBootServletInitializer {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(Ds2020Application.class, args);
     }
+
 }

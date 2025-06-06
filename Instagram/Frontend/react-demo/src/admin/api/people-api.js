@@ -80,11 +80,21 @@ function authenticateUser(username, password, callback){
     RestApiClient.performRequest(request, callback);
 }
 
+function banPerson(idPerson, callback){
+    let request = new Request(HOST.people_api + endpoint.people + "/ban/" + idPerson, {
+        method: 'GET',
+    });
+
+    // console.log("URL: " + request.url);
+    RestApiClient.performRequest(request, callback);
+}
+
 export {
     getPersons,
     getPersonById,
     postPerson,
     deletePerson,
     authenticateUser,
-    editPerson
+    editPerson,
+    banPerson
 };
