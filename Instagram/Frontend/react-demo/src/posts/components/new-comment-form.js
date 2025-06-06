@@ -62,7 +62,6 @@ class NewCommentForm extends React.Component {
       if (status === 200 || status === 201) {
         this.setState({ text: '', image: null, imageSource: null, formIsValid: false });
 
-        // După ce se adaugă comentariul, actualizează statusul postării dacă e nevoie
         API_POSTS.getPostById(postId, (postResult, getStatus) => {
           if (postResult && getStatus === 200 && postResult.status.toLowerCase() === 'just posted') {
             const updatedPost = {
@@ -74,10 +73,10 @@ class NewCommentForm extends React.Component {
               if (updateStatus === 200 || updateStatus === 204) {
                 console.log("Status updated to 'first reactions'");
               }
-              reloadComments(); // apelă reîncărcarea comentariilor după update
+              reloadComments();
             });
           } else {
-            reloadComments(); // dacă statusul nu era „just posted”, doar reîncarcă
+            reloadComments(); 
           }
         });
       } else {

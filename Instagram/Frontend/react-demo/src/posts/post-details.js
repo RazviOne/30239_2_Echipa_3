@@ -528,7 +528,7 @@ class PostDetails extends React.Component {
                                         </div>
                                     </Col>
                                     <Col>
-                                        {this.state.post.idPerson === user.idPerson && (
+                                        {(user &&(this.state.post.idPerson === user.idPerson || user.status === 2)) && (
                                             <div style={{display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'flex-end'}}>
                                                 <Button color="secondary" onClick={this.toggleEditPostForm}>Edit</Button>
                                                 <Button color="danger" onClick={this.handlePostDelete}>Delete</Button>
@@ -624,7 +624,7 @@ class PostDetails extends React.Component {
                                             </Button>
                                         </div>
 
-                                        {comment.idPerson === user.idPerson && (
+                                        {(user &&(comment.idPerson === user.idPerson || user.status === 2)) && (
                                             <div style={{ display: 'flex', gap: '1rem' }}>
                                             <Button color="secondary" size="sm" onClick={() => this.toggleEditCommentForm(comment.idPost)}>Edit</Button>
                                             <Button color="danger" size="sm" onClick={() => this.handleDeleteComment(comment.idPost)}>Delete</Button>
